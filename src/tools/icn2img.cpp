@@ -102,7 +102,7 @@ int main( int argc, char ** argv )
             dstfile += ".png";
             shortdstfile += ".png";
 #endif
-            if ( fheroes2::Save( image, dstfile, 23 ) ) {
+            if ( fheroes2::Save( image, dstfile /*, 23*/ ) ) {
                 fs << " <sprite index=\"" << ii + 1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << head.offsetX << "\" oy=\"" << head.offsetY << "\"/>"
                    << std::endl;
             }
