@@ -77,7 +77,7 @@ uint32_t Monster::GetMissileICN( uint32_t monsterID )
 Monster::Monster( const int m )
     : id( UNKNOWN )
 {
-    if ( m <= WATER_ELEMENT ) {
+    if ( m < MONSTER_RND1 ) {
         id = m;
     }
     else if ( MONSTER_RND1 == m )
@@ -475,6 +475,8 @@ Monster Monster::GetDowngrade() const
         return Monster( LICH );
     case MINOTAUR_KING:
         return Monster( MINOTAUR );
+    case ACID_HYDRA:
+        return Monster( ACID_HYDRA );
     case RED_DRAGON:
         return Monster( GREEN_DRAGON );
     case BLACK_DRAGON:
@@ -528,6 +530,8 @@ Monster Monster::GetUpgrade( void ) const
         return Monster( POWER_LICH );
     case MINOTAUR:
         return Monster( MINOTAUR_KING );
+    case HYDRA:
+        return Monster( ACID_HYDRA );
     case GREEN_DRAGON:
         return Monster( RED_DRAGON );
     case RED_DRAGON:
@@ -710,7 +714,7 @@ Monster Monster::FromDwelling( int race, u32 dwelling )
         case Race::SORC:
             return Monster( UNICORN );
         case Race::WRLK:
-            return Monster( HYDRA );
+            return Monster( ACID_HYDRA );
         case Race::WZRD:
             return Monster( ARCHMAGE );
         case Race::NECR:
@@ -787,10 +791,10 @@ Monster Monster::FromDwelling( int race, u32 dwelling )
 Monster Monster::Rand( const LevelType type )
 {
     if ( type == LevelType::LEVEL_ANY )
-        return Monster( Rand::Get( PEASANT, WATER_ELEMENT ) );
+        return Monster( Rand::Get( PEASANT, LAST_VALID_MONSTER ) );
     static std::vector<Monster> monstersVec[static_cast<int>( LevelType::LEVEL_4 )];
     if ( monstersVec[0].empty() ) {
-        for ( uint32_t i = PEASANT; i <= WATER_ELEMENT; ++i ) {
+        for ( uint32_t i = PEASANT; i <= LAST_VALID_MONSTER; ++i ) {
             const Monster monster( i );
             if ( monster.GetRandomUnitLevel() > LevelType::LEVEL_ANY )
                 monstersVec[static_cast<int>( monster.GetRandomUnitLevel() ) - 1].push_back( monster );
@@ -874,6 +878,7 @@ Monster::LevelType Monster::GetRandomUnitLevel() const
     case UNICORN:
     case PHOENIX:
     case HYDRA:
+    case ACID_HYDRA:
     case GREEN_DRAGON:
     case RED_DRAGON:
     case BLACK_DRAGON:
@@ -971,6 +976,7 @@ u32 Monster::GetDwelling( void ) const
     case WAR_TROLL:
     case ARCHMAGE:
     case POWER_LICH:
+    case ACID_HYDRA:
         return DWELLING_UPGRADE5;
 
     case PALADIN:
@@ -1019,7 +1025,7 @@ u32 Monster::GetSpriteIndex( void ) const
 
 int Monster::ICNMonh( void ) const
 {
-    return id >= PEASANT && id <= WATER_ELEMENT ? ICN::MONH0000 + id - PEASANT : ICN::UNKNOWN;
+    return id >= PEASANT && id <= LAST_VALID_MONSTER ? ICN::MONH0000 + id - PEASANT : ICN::UNKNOWN;
 }
 
 payment_t Monster::GetCost( void ) const

@@ -380,7 +380,7 @@ Monster Dialog::SelectMonster( int id )
     // setup cursor
     const CursorRestorer cursorRestorer( true, Cursor::POINTER );
 
-    std::vector<int> monsters( static_cast<int>( Monster::WATER_ELEMENT ), Monster::UNKNOWN );
+    std::vector<int> monsters( static_cast<int>( Monster::LAST_VALID_MONSTER ), Monster::UNKNOWN );
 
     for ( size_t i = 0; i < monsters.size(); ++i )
         monsters[i] = static_cast<int>( i + 1 ); // skip Monser::UNKNOWN, safe to do this as the monsters of spells can't be more than 2 billion

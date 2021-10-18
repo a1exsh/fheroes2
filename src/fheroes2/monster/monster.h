@@ -120,14 +120,17 @@ public:
         FIRE_ELEMENT,
         WATER_ELEMENT,
 
+        ACID_HYDRA,
+
+        // IMPORTANT! Put all new monsters just above this line.
         MONSTER_RND1,
         MONSTER_RND2,
         MONSTER_RND3,
         MONSTER_RND4,
         MONSTER_RND,
 
-        // IMPORTANT! Put all new monsters just above this line.
-        MONSTER_COUNT
+        MONSTER_COUNT,
+        LAST_VALID_MONSTER = ACID_HYDRA
     };
 
     Monster( const int m = UNKNOWN );

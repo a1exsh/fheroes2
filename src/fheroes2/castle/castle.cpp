@@ -299,7 +299,7 @@ void Castle::PostLoad( void )
         building &= ~( DWELLING_UPGRADE5 | DWELLING_UPGRADE6 );
         break;
     case Race::WRLK:
-        building &= ~( DWELLING_UPGRADE2 | DWELLING_UPGRADE3 | DWELLING_UPGRADE5 );
+        building &= ~( DWELLING_UPGRADE2 | DWELLING_UPGRADE3 /*| DWELLING_UPGRADE5*/ );
         break;
     case Race::WZRD:
         building &= ~( DWELLING_UPGRADE2 | DWELLING_UPGRADE4 );
@@ -1224,11 +1224,11 @@ int Castle::CheckBuyBuilding( u32 build ) const
             return UNKNOWN_UPGRADE;
         break;
     case DWELLING_UPGRADE4:
-        if ( (Race::WZRD)&race )
+        if ( (Race::WZRD) & race )
             return UNKNOWN_UPGRADE;
         break;
     case DWELLING_UPGRADE5:
-        if ( ( Race::SORC | Race::WRLK ) & race )
+        if ( ( Race::SORC /*| Race::WRLK*/ ) & race )
             return UNKNOWN_UPGRADE;
         break;
     case DWELLING_UPGRADE6:
@@ -1993,6 +1993,8 @@ u32 Castle::GetUpgradeBuilding( u32 build ) const
         switch ( build ) {
         case DWELLING_MONSTER4:
             return DWELLING_UPGRADE4;
+        case DWELLING_MONSTER5:
+            return DWELLING_UPGRADE5;
         case DWELLING_MONSTER6:
             return isBuild( DWELLING_UPGRADE6 ) ? DWELLING_UPGRADE7 : DWELLING_UPGRADE6;
         default:
