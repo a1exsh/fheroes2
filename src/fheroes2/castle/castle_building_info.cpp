@@ -557,6 +557,8 @@ namespace
             return _( "Upg. Maze" );
         case DWELLING_MONSTER5:
             return _( "Swamp" );
+        case DWELLING_UPGRADE5:
+            return _( "Upg. Swamp" );
         case DWELLING_MONSTER6:
             return _( "Green Tower" );
         case DWELLING_UPGRADE6:

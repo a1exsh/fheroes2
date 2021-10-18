@@ -31,8 +31,10 @@
 #include "icn.h"
 #include "image.h"
 #include "image_tool.h"
+#include "logging.h"
 #include "pal.h"
 #include "screen.h"
+#include "system.h"
 #include "text.h"
 #include "til.h"
 #include "ui_text.h"
@@ -105,9 +107,30 @@ namespace fheroes2
 {
     namespace AGG
     {
+        void LoadImagesFromDir( const int id, const std::string & pathToImagesDir )
+        {
+            DEBUG_LOG( DBG_GAME, DBG_INFO, "path: " << pathToImagesDir );
+
+            const uint32_t count = 2;
+
+            _icnVsSprite[id].resize( count );
+
+            for ( uint32_t i = 1; i < count; ++i ) {
+                fheroes2::Load( System::ConcatePath( pathToImagesDir, "001.png" ), _icnVsSprite[id][i] );
+            }
+        }
+
         void LoadOriginalICN( int id )
         {
-            const std::vector<uint8_t> & body = ::AGG::ReadChunk( ICN::GetString( id ) );
+            const char * icnString = ICN::GetString( id );
+
+            if ( strcmp( icnString, "HYDRA2.ICN" ) == 0 ) {
+                const std::string pathToimagesDir( "/home/ash/Pictures/Illia/Säurehydra" );
+                LoadImagesFromDir( id, pathToimagesDir );
+                return;
+            }
+
+            const std::vector<uint8_t> & body = ::AGG::ReadChunk( icnString );
 
             if ( body.empty() ) {
                 return;

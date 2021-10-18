@@ -326,6 +326,7 @@ namespace ICN
         HSBTNS,
         HSICONS,
         HYDRA,
+        HYDRA2,
         HYPNOTIZ,
         ICECLOUD,
         KEEP,

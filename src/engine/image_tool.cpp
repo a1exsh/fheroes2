@@ -136,7 +136,7 @@ namespace fheroes2
 
     bool Load( const std::string & path, Image & image )
     {
-        SDL_Surface * surface = SDL_LoadBMP( path.c_str() );
+        SDL_Surface * surface = IMG_Load( path.c_str() );
         if ( surface == nullptr ) {
             return false;
         }
