@@ -62,15 +62,15 @@ int main( int argc, char ** argv )
         return EXIT_SUCCESS;
     }
 
-    // write file "spec.xml"
-    std::string name_spec_file = System::ConcatePath( prefix, "spec.xml" );
+    std::string name_spec_file = System::ConcatePath( prefix, "spec.txt" );
     std::fstream fs( name_spec_file.c_str(), std::ios::out );
     if ( fs.fail() ) {
         std::cout << "error write file: " << name_spec_file << std::endl;
         return EXIT_SUCCESS;
     }
 
-    fs << "<?xml version=\"1.0\" ?>" << std::endl << "<icn name=\"" << shortname << ".icn\" count=\"" << count_sprite << "\">" << std::endl;
+    //fs << "<?xml version=\"1.0\" ?>" << std::endl << "<icn name=\"" << shortname << ".icn\" count=\"" << count_sprite << "\">" << std::endl;
+    fs << count_sprite << std::endl;
 
     size_t save_pos = sf.tell();
 
@@ -83,7 +83,7 @@ int main( int argc, char ** argv )
 
         u32 data_size = ( ii + 1 != count_sprite ? headers[ii + 1].offsetData - head.offsetData : total_size - head.offsetData );
         sf.seek( save_pos + head.offsetData );
-        std::cerr << data_size << std::endl;
+        //std::cerr << data_size << std::endl;
         std::vector<u8> buf = sf.getRaw( data_size );
 
         if ( !buf.empty() ) {
@@ -103,14 +103,16 @@ int main( int argc, char ** argv )
             shortdstfile += ".png";
 #endif
             if ( fheroes2::Save( image, dstfile /*, 23*/ ) ) {
-                fs << " <sprite index=\"" << ii + 1 << "\" name=\"" << shortdstfile.c_str() << "\" ox=\"" << head.offsetX << "\" oy=\"" << head.offsetY << "\"/>"
-                   << std::endl;
+                // fs << " <sprite index=\"" << ii + 1 << "\" name=\"" << shortdstfile.c_str()
+                //    << "\" ox=\"" << static_cast<int16_t>( head.offsetX ) << "\" oy=\"" << static_cast<int16_t>( head.offsetY ) << "\"/>"
+                //    << std::endl;
             }
+            fs << static_cast<int16_t>( head.offsetX ) << ' ' << static_cast<int16_t>( head.offsetY ) << std::endl;
         }
     }
 
     sf.close();
-    fs << "</icn>" << std::endl;
+    //fs << "</icn>" << std::endl;
     fs.close();
     std::cout << "expand to: " << prefix << std::endl;
 

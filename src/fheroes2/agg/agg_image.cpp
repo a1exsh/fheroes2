@@ -107,26 +107,51 @@ namespace fheroes2
 {
     namespace AGG
     {
-        void LoadImagesFromDir( const int id, const std::string & pathToImagesDir )
+        bool LoadImagesFromDir( const int id, const std::string & pathToImagesDir )
         {
-            DEBUG_LOG( DBG_GAME, DBG_INFO, "path: " << pathToImagesDir );
+            std::string pathToImagesSpec = System::ConcatePath( pathToImagesDir, "spec.txt" );
 
-            const uint32_t count = 2;
+            FILE * const f = fopen(pathToImagesSpec.c_str(), "r" );
+            if ( nullptr == f ) {
+                return false;
+            }
+
+            int count;
+            if ( fscanf( f, "%d", &count ) != 1 ) {
+                DEBUG_LOG( DBG_ENGINE, DBG_WARN, "failed to parse image count from: " << pathToImagesSpec );
+                fclose( f );
+                return false;
+            }
 
             _icnVsSprite[id].resize( count );
 
-            for ( uint32_t i = 1; i < count; ++i ) {
-                fheroes2::Load( System::ConcatePath( pathToImagesDir, "001.png" ), _icnVsSprite[id][i] );
+            for ( int i = 0; i < count; ++i ) {
+
+                int offsetX;
+                int offsetY;
+                if ( fscanf( f, "%d %d", &offsetX, &offsetY ) != 2 ) {
+                    DEBUG_LOG( DBG_ENGINE, DBG_WARN, "failed to parse sprite offsets from: " << pathToImagesSpec << ":" << i );
+                    fclose( f );
+                    return false;
+                }
+                _icnVsSprite[id][i].setPosition( offsetX, offsetY );
+
+                char fname[16];
+                snprintf( fname, 16, "%03d.png", i );
+                fheroes2::Load( System::ConcatePath( pathToImagesDir, fname ), _icnVsSprite[id][i] );
             }
+
+            fclose( f );
+
+            return true;
         }
 
         void LoadOriginalICN( int id )
         {
             const char * icnString = ICN::GetString( id );
 
-            if ( strcmp( icnString, "HYDRA2.ICN" ) == 0 ) {
-                const std::string pathToimagesDir( "/home/ash/Pictures/Illia/Säurehydra" );
-                LoadImagesFromDir( id, pathToimagesDir );
+            std::string pathToImagesDir = System::ConcatePath( System::ConcatePath( System::GetDataDirectory( "fheroes2" ), "icn" ), icnString );
+            if ( LoadImagesFromDir( id, pathToImagesDir ) ) {
                 return;
             }
 
