@@ -207,7 +207,7 @@ namespace
             { 7, 7, 2, 8, 35, Speed::VERYFAST, 0, {}, {} }, // Air Elemental
             { 8, 6, 4, 6, 40, Speed::FAST, 0, {}, {} }, // Fire Elemental
             { 6, 8, 3, 7, 45, Speed::AVERAGE, 0, {}, {} }, // Water Elemental
-            { 8, 9, 6, 12, 75, Speed::VERYSLOW, 0, {}, {} }, // Acid Hydra
+            { 10, 11, 12, 24, 125, Speed::SLOW, 0, {}, {} }, // Acid Hydra
             { 0, 0, 0, 0, 0, Speed::VERYSLOW, 0, {}, {} }, // Random Monster
             { 0, 0, 0, 0, 0, Speed::VERYSLOW, 0, {}, {} }, // Random Monster 1
             { 0, 0, 0, 0, 0, Speed::VERYSLOW, 0, {}, {} }, // Random Monster 2
@@ -284,7 +284,7 @@ namespace
                 { gettext_noop( "Air Elemental" ), gettext_noop( "Air Elementals" ), 4, Race::NONE, 4, { 500, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Fire Elemental" ), gettext_noop( "Fire Elementals" ), 4, Race::NONE, 4, { 500, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Water Elemental" ), gettext_noop( "Water Elementals" ), 4, Race::NONE, 4, { 500, 0, 0, 0, 0, 0, 0 } },
-                { gettext_noop( "Acid Hydra" ), gettext_noop( "Acid Hydras" ), 2, Race::WRLK, 5, { 800, 0, 0, 0, 0, 0, 0 } },
+                { gettext_noop( "Acid Hydra" ), gettext_noop( "Acid Hydras" ), 2, Race::WRLK, 5, { 1250, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Random Monster" ), gettext_noop( "Random Monsters" ), 0, Race::NONE, 0, { 0, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Random Monster 1" ), gettext_noop( "Random Monsters 1" ), 0, Race::NONE, 1, { 0, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Random Monster 2" ), gettext_noop( "Random Monsters 2" ), 0, Race::NONE, 2, { 0, 0, 0, 0, 0, 0, 0 } },

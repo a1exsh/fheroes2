@@ -1770,6 +1770,8 @@ int Castle::GetICNBuilding( u32 build, int race )
             return ICN::TWNWUP_3;
         case DWELLING_MONSTER5:
             return ICN::TWNWDW_4;
+        case DWELLING_UPGRADE5:
+            return ICN::TWNWUP_4;
         case DWELLING_MONSTER6:
             return ICN::TWNWDW_5;
         case DWELLING_UPGRADE6:
