@@ -476,7 +476,7 @@ Monster Monster::GetDowngrade() const
     case MINOTAUR_KING:
         return Monster( MINOTAUR );
     case ACID_HYDRA:
-        return Monster( ACID_HYDRA );
+        return Monster( HYDRA );
     case RED_DRAGON:
         return Monster( GREEN_DRAGON );
     case BLACK_DRAGON:
