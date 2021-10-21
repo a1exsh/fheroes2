@@ -116,7 +116,7 @@ public:
 
         Text text( std::to_string( troop.GetCount() ), Font::SMALL );
 
-        const fheroes2::Sprite & mons32 = fheroes2::AGG::GetICN( ICN::MONS32, troop.GetSpriteIndex() );
+        const fheroes2::Sprite & mons32 = fheroes2::AGG::getMons32ICN( troop.GetSpriteIndex() );
         fheroes2::Rect srcrt( 0, 0, mons32.width(), mons32.height() );
 
         if ( mons32.width() > roi.width ) {

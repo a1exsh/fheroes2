@@ -120,17 +120,16 @@ public:
         FIRE_ELEMENT,
         WATER_ELEMENT,
 
-        ACID_HYDRA,
-
-        // IMPORTANT! Put all new monsters just above this line.
         MONSTER_RND1,
         MONSTER_RND2,
         MONSTER_RND3,
         MONSTER_RND4,
         MONSTER_RND,
 
-        MONSTER_COUNT,
-        LAST_VALID_MONSTER = ACID_HYDRA
+        ACID_HYDRA,
+
+        // IMPORTANT! Put all new monsters just above this line.
+        MONSTER_COUNT
     };
 
     Monster( const int m = UNKNOWN );
@@ -198,7 +197,9 @@ public:
 
     int GetMonsterSprite() const;
 
+    static Monster fromSpriteIndex( const int index );
     static Monster Rand( const LevelType type );
+    static bool isRandom( const int m );
 
     static u32 GetCountFromHitPoints( const Monster &, u32 );
 

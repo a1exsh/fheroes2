@@ -62,7 +62,7 @@ public:
         fheroes2::Display & display = fheroes2::Display::instance();
         fheroes2::Blit( back, display, x, y );
         if ( troop.isValid() ) {
-            const fheroes2::Sprite & mons32 = fheroes2::AGG::GetICN( ICN::MONS32, troop.GetSpriteIndex() );
+            const fheroes2::Sprite & mons32 = fheroes2::AGG::getMons32ICN( troop.GetSpriteIndex() );
             fheroes2::Blit( mons32, display, x + ( back.width() - mons32.width() ) / 2, y + back.height() - mons32.height() - 11 );
 
             if ( readonly )

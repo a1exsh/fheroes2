@@ -274,7 +274,7 @@ void DrawBestMonsterIcons( const Colors & colors, const fheroes2::Point & pos, i
     for ( size_t i = 0; i < colors.size(); ++i ) {
         const Monster monster = world.GetKingdom( colors[i] ).GetStrongestMonster();
         if ( monster.isValid() ) {
-            const fheroes2::Sprite & sprite = fheroes2::AGG::GetICN( ICN::MONS32, monster.GetSpriteIndex() );
+            const fheroes2::Sprite & sprite = fheroes2::AGG::getMons32ICN( monster.GetSpriteIndex() );
             if ( !sprite.empty() )
                 fheroes2::Blit( sprite, fheroes2::Display::instance(), pos.x + static_cast<int32_t>( i ) * step - sprite.width() / 2, pos.y );
         }

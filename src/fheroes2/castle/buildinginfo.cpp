@@ -703,7 +703,7 @@ void DwellingsBar::RedrawBackground( const fheroes2::Rect & pos, fheroes2::Image
 
 void DwellingsBar::RedrawItem( DwellingItem & dwl, const fheroes2::Rect & pos, fheroes2::Image & dstsf )
 {
-    const fheroes2::Sprite & mons32 = fheroes2::AGG::GetICN( ICN::MONS32, dwl.mons.GetSpriteIndex() );
+    const fheroes2::Sprite & mons32 = fheroes2::AGG::getMons32ICN( dwl.mons.GetSpriteIndex() );
     fheroes2::Blit( mons32, dstsf, pos.x + ( pos.width - mons32.width() ) / 2, pos.y + ( pos.height - 3 - mons32.height() ) );
 
     if ( castle.isBuild( dwl.type ) ) {

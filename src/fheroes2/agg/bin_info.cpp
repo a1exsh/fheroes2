@@ -302,7 +302,7 @@ namespace Bin_Info
 
     void InitBinInfo()
     {
-        for ( int i = Monster::UNKNOWN; i < Monster::LAST_VALID_MONSTER + 1; ++i )
+        for ( int i = Monster::UNKNOWN; i < Monster::MONSTER_COUNT; ++i )
             animRefs[i] = _infoCache.createAnimReference( i );
     }
 }

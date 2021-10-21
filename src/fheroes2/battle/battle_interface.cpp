@@ -843,7 +843,7 @@ void Battle::ArmiesOrder::QueueEventProcessing( std::string & msg, const fheroes
 
 void Battle::ArmiesOrder::RedrawUnit( const fheroes2::Rect & pos, const Battle::Unit & unit, bool revert, bool current, fheroes2::Image & output ) const
 {
-    const fheroes2::Sprite & mons32 = fheroes2::AGG::GetICN( ICN::MONS32, unit.GetSpriteIndex() );
+    const fheroes2::Sprite & mons32 = fheroes2::AGG::getMons32ICN( unit.GetSpriteIndex() );
 
     // background
     fheroes2::Fill( output, pos.x, pos.y, pos.width, pos.height, fheroes2::GetColorId( 0x33, 0x33, 0x33 ) );

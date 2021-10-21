@@ -77,7 +77,7 @@ uint32_t Monster::GetMissileICN( uint32_t monsterID )
 Monster::Monster( const int m )
     : id( UNKNOWN )
 {
-    if ( m < MONSTER_RND1 ) {
+    if ( m < MONSTER_COUNT && !isRandom( m ) ) {
         id = m;
     }
     else if ( MONSTER_RND1 == m )
@@ -791,16 +791,33 @@ Monster Monster::FromDwelling( int race, u32 dwelling )
 Monster Monster::Rand( const LevelType type )
 {
     if ( type == LevelType::LEVEL_ANY )
-        return Monster( Rand::Get( PEASANT, LAST_VALID_MONSTER ) );
+        return Monster( Rand::Get( PEASANT, MONSTER_COUNT - 1 ) );
+
     static std::vector<Monster> monstersVec[static_cast<int>( LevelType::LEVEL_4 )];
     if ( monstersVec[0].empty() ) {
-        for ( uint32_t i = PEASANT; i <= LAST_VALID_MONSTER; ++i ) {
-            const Monster monster( i );
-            if ( monster.GetRandomUnitLevel() > LevelType::LEVEL_ANY )
-                monstersVec[static_cast<int>( monster.GetRandomUnitLevel() ) - 1].push_back( monster );
+        for ( uint32_t i = PEASANT; i < MONSTER_COUNT; ++i ) {
+            if ( !isRandom( i ) ) {
+                const Monster monster( i );
+                if ( monster.GetRandomUnitLevel() > LevelType::LEVEL_ANY )
+                    monstersVec[static_cast<int>( monster.GetRandomUnitLevel() ) - 1].push_back( monster );
+            }
         }
     }
     return Rand::Get( monstersVec[static_cast<int>( type ) - 1] );
+}
+
+bool Monster::isRandom( const int m )
+{
+    switch ( m ) {
+    case MONSTER_RND1:
+    case MONSTER_RND2:
+    case MONSTER_RND3:
+    case MONSTER_RND4:
+    case MONSTER_RND:
+        return true;
+    default:
+        return false;
+    }
 }
 
 int Monster::GetMonsterLevel() const
@@ -1023,9 +1040,14 @@ u32 Monster::GetSpriteIndex( void ) const
     return UNKNOWN < id ? id - 1 : 0;
 }
 
+Monster Monster::fromSpriteIndex( const int index )
+{
+    return Monster( index + 1 );
+}
+
 int Monster::ICNMonh( void ) const
 {
-    return id >= PEASANT && id <= LAST_VALID_MONSTER ? ICN::MONH0000 + id - PEASANT : ICN::UNKNOWN;
+    return id >= PEASANT && id < MONSTER_COUNT ? ICN::MONH0000 + id - PEASANT : ICN::UNKNOWN;
 }
 
 payment_t Monster::GetCost( void ) const

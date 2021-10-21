@@ -32,6 +32,7 @@
 #include "image.h"
 #include "image_tool.h"
 #include "logging.h"
+#include "monster.h"
 #include "pal.h"
 #include "screen.h"
 #include "system.h"
@@ -1339,6 +1340,12 @@ namespace fheroes2
             }
 
             return _icnVsSprite[icnId][index];
+        }
+
+        const Sprite & getMons32ICN( const int index )
+        {
+            const int lastOriginalMons32IcnIndex = Monster::MONSTER_RND - 1;
+            return index <= lastOriginalMons32IcnIndex ? GetICN( ICN::MONS32, index ) : GetICN( ICN::MONS32X, index - lastOriginalMons32IcnIndex - 1 );
         }
 
         uint32_t GetICNCount( int icnId )
