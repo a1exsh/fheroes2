@@ -612,7 +612,7 @@ void Battle::Arena::DialogBattleNecromancy( const uint32_t raiseCount, const uin
     yOffset += bsTextIndent;
     messageBox.Blit( xOffset, yOffset );
 
-    const fheroes2::Sprite & monsterSprite = fheroes2::AGG::GetICN( ICN::MONS32, mons.GetSpriteIndex() );
+    const fheroes2::Sprite & monsterSprite = fheroes2::AGG::getMons32ICN( mons.GetSpriteIndex() );
     yOffset += messageBox.h() + monsterSprite.height();
     fheroes2::Blit( monsterSprite, display, ( display.width() - monsterSprite.width() ) / 2, yOffset );
 

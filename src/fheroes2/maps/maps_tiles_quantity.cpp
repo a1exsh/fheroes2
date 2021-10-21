@@ -980,7 +980,7 @@ void Maps::Tiles::UpdateMonsterInfo( Tiles & tile )
     Monster mons;
 
     if ( MP2::OBJ_MONSTER == tile.GetObject() ) {
-        mons = Monster( tile.objectIndex + 1 ); // ICN::MONS32 start from PEASANT
+        mons = Monster::fromSpriteIndex( tile.objectIndex );
     }
     else {
         switch ( tile.GetObject() ) {

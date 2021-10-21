@@ -105,7 +105,7 @@ public:
     void RedrawItem( const int & index, s32 dstx, s32 dsty, bool current ) override
     {
         Monster mons( index );
-        fheroes2::Blit( fheroes2::AGG::GetICN( ICN::MONS32, mons.GetSpriteIndex() ), fheroes2::Display::instance(), dstx + 5, dsty + 3 );
+        fheroes2::Blit( fheroes2::AGG::getMons32ICN( mons.GetSpriteIndex() ), fheroes2::Display::instance(), dstx + 5, dsty + 3 );
 
         Text text( mons.GetName(), ( current ? Font::YELLOW_BIG : Font::BIG ) );
         text.Blit( dstx + 50, dsty + 10 );
@@ -380,7 +380,7 @@ Monster Dialog::SelectMonster( int id )
     // setup cursor
     const CursorRestorer cursorRestorer( true, Cursor::POINTER );
 
-    std::vector<int> monsters( static_cast<int>( Monster::LAST_VALID_MONSTER ), Monster::UNKNOWN );
+    std::vector<int> monsters( static_cast<int>( Monster::MONSTER_COUNT ), Monster::UNKNOWN );
 
     for ( size_t i = 0; i < monsters.size(); ++i )
         monsters[i] = static_cast<int>( i + 1 ); // skip Monser::UNKNOWN, safe to do this as the monsters of spells can't be more than 2 billion

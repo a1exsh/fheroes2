@@ -32,6 +32,7 @@ namespace fheroes2
     namespace AGG
     {
         const Sprite & GetICN( int icnId, uint32_t index );
+        const Sprite & getMons32ICN( const int index );
         uint32_t GetICNCount( int icnId );
 
         // shapeId could be 0, 1, 2 or 3 only
