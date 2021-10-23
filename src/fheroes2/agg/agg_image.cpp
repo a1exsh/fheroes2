@@ -1348,6 +1348,12 @@ namespace fheroes2
             return index <= lastOriginalMons32IcnIndex ? GetICN( ICN::MONS32, index ) : GetICN( ICN::MONS32X, index - lastOriginalMons32IcnIndex - 1 );
         }
 
+        const Sprite & getMiniMonICN( const int index )
+        {
+            const int firstExtendedMiniMonIcnIndex = 71 * 9;
+            return index >= firstExtendedMiniMonIcnIndex ? GetICN( ICN::MINIMONX, index - firstExtendedMiniMonIcnIndex ) : GetICN( ICN::MINIMON, index );
+        }
+
         uint32_t GetICNCount( int icnId )
         {
             if ( !IsValidICNId( icnId ) ) {
