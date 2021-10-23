@@ -366,6 +366,7 @@ namespace ICN
         MINIHERO,
         MINILKMR,
         MINIMON,
+        MINIMONX,
         MINIPORT,
         MINISS,
         MINITOWN,

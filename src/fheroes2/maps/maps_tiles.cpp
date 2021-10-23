@@ -1311,11 +1311,11 @@ void Maps::Tiles::RedrawMonster( fheroes2::Image & dst, const fheroes2::Rect & v
     const Monster & monster = QuantityMonster();
     const std::pair<uint32_t, uint32_t> spriteIndicies = GetMonsterSpriteIndices( *this, monster.GetSpriteIndex() );
 
-    const fheroes2::Sprite & sprite = fheroes2::AGG::GetICN( ICN::MINIMON, spriteIndicies.first );
+    const fheroes2::Sprite & sprite = fheroes2::AGG::getMiniMonICN( spriteIndicies.first );
     area.BlitOnTile( dst, sprite, sprite.x() + 16, sprite.y() + 30, mp );
 
     if ( spriteIndicies.second ) {
-        const fheroes2::Sprite & animatedSprite = fheroes2::AGG::GetICN( ICN::MINIMON, spriteIndicies.second );
+        const fheroes2::Sprite & animatedSprite = fheroes2::AGG::getMiniMonICN( spriteIndicies.second );
         area.BlitOnTile( dst, animatedSprite, animatedSprite.x() + 16, animatedSprite.y() + 30, mp );
     }
 }

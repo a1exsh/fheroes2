@@ -102,7 +102,7 @@ namespace ICN
             { MAGEGLDW, "MAGEGLDW.ICN" }, { MAGEGLDZ, "MAGEGLDZ.ICN" }, { MAGIC01, "MAGIC01.ICN" },   { MAGIC02, "MAGIC02.ICN" },   { MAGIC03, "MAGIC03.ICN" },
             { MAGIC04, "MAGIC04.ICN" },   { MAGIC06, "MAGIC06.ICN" },   { MAGIC07, "MAGIC07.ICN" },   { MAGIC08, "MAGIC08.ICN" },   { MANA, "MANA.ICN" },
             { MEDUSA, "MEDUSA.ICN" },     { METEOR, "METEOR.ICN" },     { MINICAPT, "MINICAPT.ICN" }, { MINIHERO, "MINIHERO.ICN" }, { MINILKMR, "MINILKMR.ICN" },
-            { MINIMON, "MINIMON.ICN" },   { MINIPORT, "MINIPORT.ICN" }, { MINISS, "MINISS.ICN" },     { MINITOWN, "MINITOWN.ICN" }, { MINOTAU2, "MINOTAU2.ICN" },
+            { MINIMON, "MINIMON.ICN" },   { MINIMONX, "MINIMONX.ICN" }, { MINIPORT, "MINIPORT.ICN" }, { MINISS, "MINISS.ICN" },     { MINITOWN, "MINITOWN.ICN" }, { MINOTAU2, "MINOTAU2.ICN" },
             { MINOTAUR, "MINOTAUR.ICN" }, { MISC12, "MISC12.ICN" },     { MISC4, "MISC4.ICN" },       { MISC6, "MISC6.ICN" },       { MOATPART, "MOATPART.ICN" },
             { MOATWHOL, "MOATWHOL.ICN" }, { MOBILITY, "MOBILITY.ICN" }, { MONH0000, "MONH0000.ICN" }, { MONH0001, "MONH0001.ICN" }, { MONH0002, "MONH0002.ICN" },
             { MONH0003, "MONH0003.ICN" }, { MONH0004, "MONH0004.ICN" }, { MONH0005, "MONH0005.ICN" }, { MONH0006, "MONH0006.ICN" }, { MONH0007, "MONH0007.ICN" },
@@ -335,6 +335,8 @@ u32 ICN::AnimationFrame( int icn, u32 start, u32 ticket, bool quantity )
     case WINCMBT:
         return 1 + ticket % 20;
     case MINIMON:
+        return start + 1 + ticket % 6;
+    case MINIMONX:
         return start + 1 + ticket % 6;
     case TWNNMAGE:
         return start + 1 + ticket % 5;
