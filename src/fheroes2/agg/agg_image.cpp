@@ -1351,13 +1351,13 @@ namespace fheroes2
 
         const Sprite & getMons32ICN( const int index )
         {
-            const int lastOriginalMons32IcnIndex = Monster::MONSTER_RND - 1;
-            return index <= lastOriginalMons32IcnIndex ? GetICN( ICN::MONS32, index ) : GetICN( ICN::MONS32X, index - lastOriginalMons32IcnIndex - 1 );
+            const int firstExtendedMons32IcnIndex = Monster::ACID_HYDRA - 1;
+            return index >= firstExtendedMons32IcnIndex ? GetICN( ICN::MONS32X, index - firstExtendedMons32IcnIndex ) : GetICN( ICN::MONS32, index );
         }
 
         const Sprite & getMiniMonICN( const int index )
         {
-            const int firstExtendedMiniMonIcnIndex = 71 * 9;
+            const int firstExtendedMiniMonIcnIndex = ( Monster::ACID_HYDRA - 1 ) * 9;
             return index >= firstExtendedMiniMonIcnIndex ? GetICN( ICN::MINIMONX, index - firstExtendedMiniMonIcnIndex ) : GetICN( ICN::MINIMON, index );
         }
 
