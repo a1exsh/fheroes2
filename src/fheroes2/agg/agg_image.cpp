@@ -979,9 +979,9 @@ namespace fheroes2
                 return true;
             case ICN::CSTLWRLK:
                 LoadOriginalICN( id );
-                LoadOriginalICN( ICN::HYDRA2_DW );
-                if ( _icnVsSprite[id].size() > 28 && _icnVsSprite[ICN::HYDRA2_DW].size() > 0 ) {
-                    _icnVsSprite[id][28] = _icnVsSprite[ICN::HYDRA2_DW][0];
+                LoadOriginalICN( ICN::HYDRA2DW );
+                if ( _icnVsSprite[id].size() > 28 && _icnVsSprite[ICN::HYDRA2DW].size() > 0 ) {
+                    _icnVsSprite[id][28] = _icnVsSprite[ICN::HYDRA2DW][0];
                 }
                 return true;
             case ICN::CSTLWZRD:

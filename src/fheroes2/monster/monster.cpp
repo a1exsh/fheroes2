@@ -1047,7 +1047,11 @@ Monster Monster::fromSpriteIndex( const int index )
 
 int Monster::ICNMonh( void ) const
 {
-    return id >= PEASANT && id < MONSTER_COUNT ? ICN::MONH0000 + id - PEASANT : ICN::UNKNOWN;
+    return ( id >= PEASANT && id < WATER_ELEMENT )
+        ? ICN::MONH0000 + id - PEASANT
+        : ( ( id >= ACID_HYDRA && id < MONSTER_COUNT )
+            ? ICN::MONH0071 + id - ACID_HYDRA
+            : ICN::UNKNOWN );
 }
 
 payment_t Monster::GetCost( void ) const
