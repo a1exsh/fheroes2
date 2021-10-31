@@ -156,7 +156,7 @@ namespace fheroes2
                 const uint8_t * inXEnd = inX + surface->w * 3;
 
                 for ( ; inX != inXEnd; inX += 3, ++outX ) {
-                    *outX = GetColorId( *( inX + 2 ), *( inX + 1 ), *inX );
+                    *outX = GetColorId( inX[0], inX[1], inX[2] );
                 }
             }
         }
@@ -177,21 +177,21 @@ namespace fheroes2
                 const uint8_t * inXEnd = inX + surface->w * 4;
 
                 for ( ; inX != inXEnd; inX += 4, ++outX, ++transformX ) {
-                    const uint8_t alpha = *( inX + 3 );
+                    const uint8_t alpha = inX[3];
                     if ( alpha < 255 ) {
                         if ( alpha == 0 ) {
                             *transformX = 1;
                         }
-                        else if ( *( inX ) == 0 && *( inX + 1 ) == 0 && *( inX + 2 ) == 0 ) {
+                        else if ( inX[0] == 0 && inX[1] == 0 && inX[2] == 0 ) {
                             *transformX = 2;
                         }
                         else {
-                            *outX = GetColorId( *( inX + 2 ), *( inX + 1 ), *inX );
+                            *outX = GetColorId( inX[0], inX[1], inX[2] );
                             *transformX = 0;
                         }
                     }
                     else {
-                        *outX = GetColorId( *( inX + 2 ), *( inX + 1 ), *inX );
+                        *outX = GetColorId( inX[0], inX[1], inX[2] );
                         *transformX = 0;
                     }
                 }
