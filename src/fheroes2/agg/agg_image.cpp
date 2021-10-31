@@ -1066,6 +1066,10 @@ namespace fheroes2
                         replaceTranformPixel( original, 3221, 69 );
                     }
                 }
+                LoadOriginalICN( ICN::PHOEN2DW );
+                if ( _icnVsSprite[id].size() > 29 && _icnVsSprite[ICN::PHOEN2DW].size() > 0 ) {
+                    _icnVsSprite[id][29] = _icnVsSprite[ICN::PHOEN2DW][0];
+                }
                 return true;
             case ICN::CURSOR_ADVENTURE_MAP: {
                 // Create needed numbers
