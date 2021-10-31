@@ -179,16 +179,8 @@ namespace fheroes2
                 for ( ; inX != inXEnd; inX += 4, ++outX, ++transformX ) {
                     const uint8_t alpha = inX[3];
                     if ( alpha < 255 ) {
-                        if ( alpha == 0 ) {
-                            *transformX = 1;
-                        }
-                        else if ( inX[0] == 0 && inX[1] == 0 && inX[2] == 0 ) {
-                            *transformX = 2;
-                        }
-                        else {
-                            *outX = GetColorId( inX[0], inX[1], inX[2] );
-                            *transformX = 0;
-                        }
+                        *outX = 0;
+                        *transformX = ( alpha == 0 ) ? 1 : 2;
                     }
                     else {
                         *outX = GetColorId( inX[0], inX[1], inX[2] );
