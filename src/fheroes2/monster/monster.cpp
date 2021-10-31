@@ -465,6 +465,8 @@ Monster Monster::GetDowngrade() const
         return Monster( ELF );
     case GREATER_DRUID:
         return Monster( DRUID );
+    case MAGIC_BIRD:
+        return Monster( PHOENIX );
     case MUTANT_ZOMBIE:
         return Monster( ZOMBIE );
     case ROYAL_MUMMY:
@@ -520,6 +522,8 @@ Monster Monster::GetUpgrade( void ) const
         return Monster( GRAND_ELF );
     case DRUID:
         return Monster( GREATER_DRUID );
+    case PHOENIX:
+        return Monster( MAGIC_BIRD );
     case ZOMBIE:
         return Monster( MUTANT_ZOMBIE );
     case MUMMY:
@@ -750,7 +754,7 @@ Monster Monster::FromDwelling( int race, u32 dwelling )
         case Race::BARB:
             return Monster( CYCLOPS );
         case Race::SORC:
-            return Monster( PHOENIX );
+            return Monster( MAGIC_BIRD );
         case Race::WRLK:
             return Monster( RED_DRAGON );
         case Race::WZRD:
@@ -894,6 +898,7 @@ Monster::LevelType Monster::GetRandomUnitLevel() const
     case CYCLOPS:
     case UNICORN:
     case PHOENIX:
+    case MAGIC_BIRD:
     case HYDRA:
     case ACID_HYDRA:
     case GREEN_DRAGON:
@@ -1005,6 +1010,7 @@ u32 Monster::GetDwelling( void ) const
         return DWELLING_MONSTER6;
 
     case CRUSADER:
+    case MAGIC_BIRD:
     case RED_DRAGON:
     case TITAN:
         return DWELLING_UPGRADE6;

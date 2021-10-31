@@ -529,6 +529,8 @@ namespace
             return _( "Fenced Meadow" );
         case DWELLING_MONSTER6:
             return _( "Red Tower" );
+        case DWELLING_UPGRADE6:
+            return _( "Sorcerer Tower" );
         default:
             break;
         }

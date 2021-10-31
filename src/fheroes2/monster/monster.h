@@ -127,6 +127,7 @@ public:
         MONSTER_RND,
 
         ACID_HYDRA,
+        MAGIC_BIRD,
 
         // IMPORTANT! Put all new monsters just above this line.
         MONSTER_COUNT

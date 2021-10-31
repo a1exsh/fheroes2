@@ -48,7 +48,8 @@ namespace
                 ICN::DRAGGREE, ICN::DRAGRED,  ICN::DRAGBLAK, ICN::HALFLING, ICN::BOAR,     ICN::GOLEM,    ICN::GOLEM2,   ICN::ROC,      ICN::MAGE1,
                 ICN::MAGE2,    ICN::TITANBLU, ICN::TITANBLA, ICN::SKELETON, ICN::ZOMBIE,   ICN::ZOMBIE2,  ICN::MUMMYW,   ICN::MUMMY2,   ICN::VAMPIRE,
                 ICN::VAMPIRE2, ICN::LICH,     ICN::LICH2,    ICN::DRAGBONE, ICN::ROGUE,    ICN::NOMAD,    ICN::GHOST,    ICN::GENIE,    ICN::MEDUSA,
-                ICN::EELEM,    ICN::AELEM,    ICN::FELEM,    ICN::WELEM,    ICN::UNKNOWN,  ICN::UNKNOWN,  ICN::UNKNOWN,  ICN::UNKNOWN,  ICN::UNKNOWN, ICN::HYDRA2 };
+                ICN::EELEM,    ICN::AELEM,    ICN::FELEM,    ICN::WELEM,    ICN::UNKNOWN,  ICN::UNKNOWN,  ICN::UNKNOWN,  ICN::UNKNOWN,  ICN::UNKNOWN,
+                ICN::HYDRA2,   ICN::PHOENIX2 };
 
         const char * binFileName[Monster::MONSTER_COUNT]
             = { "UNKNOWN",      "PEAS_FRM.BIN", "ARCHRFRM.BIN", "ARCHRFRM.BIN", "PIKMNFRM.BIN", "PIKMNFRM.BIN", "SWRDSFRM.BIN", "SWRDSFRM.BIN", "CVLRYFRM.BIN",
@@ -58,7 +59,8 @@ namespace
                 "DRAGGFRM.BIN", "DRAGRFRM.BIN", "DRAGBFRM.BIN", "HALFLFRM.BIN", "BOAR_FRM.BIN", "GOLEMFRM.BIN", "GOLEMFRM.BIN", "ROC__FRM.BIN", "MAGE1FRM.BIN",
                 "MAGE1FRM.BIN", "TITANFRM.BIN", "TITA2FRM.BIN", "SKEL_FRM.BIN", "ZOMB_FRM.BIN", "ZOMB_FRM.BIN", "MUMMYFRM.BIN", "MUMMYFRM.BIN", "VAMPIFRM.BIN",
                 "VAMPIFRM.BIN", "LICH_FRM.BIN", "LICH_FRM.BIN", "DRABNFRM.BIN", "ROGUEFRM.BIN", "NOMADFRM.BIN", "GHOSTFRM.BIN", "GENIEFRM.BIN", "MEDUSFRM.BIN",
-                "FELEMFRM.BIN", "FELEMFRM.BIN", "FELEMFRM.BIN", "FELEMFRM.BIN", "UNKNOWN",      "UNKNOWN",      "UNKNOWN",      "UNKNOWN",      "UNKNOWN", "HYDRAFRM.BIN" };
+                "FELEMFRM.BIN", "FELEMFRM.BIN", "FELEMFRM.BIN", "FELEMFRM.BIN", "UNKNOWN",      "UNKNOWN",      "UNKNOWN",      "UNKNOWN",      "UNKNOWN",
+                "HYDRAFRM.BIN", "PHOENFRM.BIN" };
 
         const fheroes2::MonsterSound monsterSounds[Monster::MONSTER_COUNT] = {
             // melee attack | death | movement | wince |ranged attack
@@ -134,7 +136,8 @@ namespace
             { M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN }, // Random Monster 2
             { M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN }, // Random Monster 3
             { M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN }, // Random Monster 4
-            { M82::HYDRATTK, M82::HYDRKILL, M82::HYDRMOVE, M82::HYDRWNCE, M82::UNKNOWN } // Acid Hydra
+            { M82::HYDRATTK, M82::HYDRKILL, M82::HYDRMOVE, M82::HYDRWNCE, M82::UNKNOWN }, // Acid Hydra
+            { M82::PHOEATTK, M82::PHOEKILL, M82::PHOEMOVE, M82::PHOEWNCE, M82::UNKNOWN } // Phoenix
         };
 
         // Monster abilities and weaknesses will be added later.
@@ -212,7 +215,8 @@ namespace
             { 0, 0, 0, 0, 0, Speed::VERYSLOW, 0, {}, {} }, // Random Monster 3
             { 0, 0, 0, 0, 0, Speed::VERYSLOW, 0, {}, {} }, // Random Monster 4
             { 0, 0, 0, 0, 0, Speed::VERYSLOW, 0, {}, {} }, // Random Monster
-            { 10, 11, 12, 24, 125, Speed::SLOW, 0, {}, {} } // Acid Hydra
+            { 10, 11, 12, 24, 125, Speed::SLOW, 0, {}, {} }, // Acid Hydra
+            { 14, 12, 50, 100, 200, Speed::ULTRAFAST, 0, {}, {} } // Phoenix
         };
 
         const fheroes2::MonsterGeneralStats monsterGeneralStats[Monster::MONSTER_COUNT]
@@ -289,7 +293,8 @@ namespace
                 { gettext_noop( "Random Monster 2" ), gettext_noop( "Random Monsters 2" ), 0, Race::NONE, 2, { 0, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Random Monster 3" ), gettext_noop( "Random Monsters 3" ), 0, Race::NONE, 3, { 0, 0, 0, 0, 0, 0, 0 } },
                 { gettext_noop( "Random Monster 4" ), gettext_noop( "Random Monsters 4" ), 0, Race::NONE, 4, { 0, 0, 0, 0, 0, 0, 0 } },
-                { gettext_noop( "Acid Hydra" ), gettext_noop( "Acid Hydras" ), 2, Race::WRLK, 5, { 1250, 0, 0, 0, 0, 0, 0 } }
+                { gettext_noop( "Acid Hydra" ), gettext_noop( "Acid Hydras" ), 2, Race::WRLK, 5, { 1250, 0, 0, 0, 0, 0, 0 } },
+                { gettext_noop( "Magic Bird" ), gettext_noop( "Magic Birds" ), 1, Race::SORC, 6, { 3000, 0, 1, 0, 0, 0, 1 } }
         };
 
         monsterData.reserve( Monster::MONSTER_COUNT );
@@ -464,6 +469,11 @@ namespace
         monsterData[Monster::ACID_HYDRA].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::DOUBLE_HEX_SIZE );
         monsterData[Monster::ACID_HYDRA].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::ALL_ADJACENT_CELL_MELEE_ATTACK );
         monsterData[Monster::ACID_HYDRA].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::NO_ENEMY_RETALIATION );
+
+        monsterData[Monster::MAGIC_BIRD].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::DOUBLE_HEX_SIZE );
+        monsterData[Monster::MAGIC_BIRD].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::TWO_CELL_MELEE_ATTACK );
+        monsterData[Monster::MAGIC_BIRD].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::FLYING );
+        monsterData[Monster::MAGIC_BIRD].battleStats.abilities.emplace_back( fheroes2::MonsterAbilityType::ELEMENTAL_SPELL_IMMUNITY );
 
         // TODO: verify that no duplicates of abilities and weaknesses exist.
     }

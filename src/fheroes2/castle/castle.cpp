@@ -296,7 +296,7 @@ void Castle::PostLoad( void )
         building &= ~( DWELLING_UPGRADE3 | DWELLING_UPGRADE6 );
         break;
     case Race::SORC:
-        building &= ~( DWELLING_UPGRADE5 | DWELLING_UPGRADE6 );
+        building &= ~( DWELLING_UPGRADE5 );
         break;
     case Race::WRLK:
         building &= ~( DWELLING_UPGRADE2 | DWELLING_UPGRADE3 /*| DWELLING_UPGRADE5*/ );
@@ -1232,7 +1232,7 @@ int Castle::CheckBuyBuilding( u32 build ) const
             return UNKNOWN_UPGRADE;
         break;
     case DWELLING_UPGRADE6:
-        if ( ( Race::BARB | Race::SORC | Race::NECR ) & race )
+        if ( ( Race::BARB /*| Race::SORC*/ | Race::NECR ) & race )
             return UNKNOWN_UPGRADE;
         break;
     case DWELLING_UPGRADE7:
@@ -1718,6 +1718,8 @@ int Castle::GetICNBuilding( u32 build, int race )
             return ICN::TWNSDW_4;
         case DWELLING_MONSTER6:
             return ICN::TWNSDW_5;
+        case DWELLING_UPGRADE6:
+            return ICN::TWNSUP_5;
         default:
             break;
         }
@@ -1987,6 +1989,8 @@ u32 Castle::GetUpgradeBuilding( u32 build ) const
             return DWELLING_UPGRADE3;
         case DWELLING_MONSTER4:
             return DWELLING_UPGRADE4;
+        case DWELLING_MONSTER6:
+            return DWELLING_UPGRADE6;
         default:
             break;
         }

@@ -210,8 +210,9 @@ namespace ICN
             { X_TRACK2, "X_TRACK2.ICN" }, { X_TRACK3, "X_TRACK3.ICN" }, { X_TRACK4, "X_TRACK4.ICN" }, { X_LOC1, "X_LOC1.ICN" },     { X_LOC2, "X_LOC2.ICN" },
             { X_LOC3, "X_LOC3.ICN" },     { XPRIMARY, "XPRIMARY.ICN" }, { Y_BFLG32, "Y-BFLG32.ICN" }, { Y_FLAG32, "Y-FLAG32.ICN" }, { YINYANG, "YINYANG.ICN" },
             { ZOMBIE2, "ZOMBIE2.ICN" },   { ZOMBIE, "ZOMBIE.ICN" },
-            { HYDRA2, "HYDRA2.ICN" },     { HYDRA2DW, "HYDRA2DW.ICN" }, { MINIMONX, "MINIMONX.ICN" }, { MONH0071, "MONH0071.ICN" }, { MONS32X, "MONS32X.ICN" },
-            { TWNWUP_4, "TWNWUP_4.ICN" } };
+            { HYDRA2, "HYDRA2.ICN" },     { HYDRA2DW, "HYDRA2DW.ICN" }, { PHOENIX2, "PHOENIX2.ICN" }, { PHOEN2DW, "PHOEN2DW.ICN" },
+            { MINIMONX, "MINIMONX.ICN" }, { MONH0071, "MONH0071.ICN" }, { MONH0072, "MONH0072.ICN" }, { MONS32X, "MONS32X.ICN" },
+            { TWNSUP_5, "TWNSUP_5.ICN" }, { TWNWUP_4, "TWNWUP_4.ICN" } };
 }
 
 const char * ICN::GetString( int icn )
