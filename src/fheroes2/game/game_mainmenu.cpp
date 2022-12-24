@@ -254,10 +254,9 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
 
     display.render();
 
-    const double scaleX = static_cast<double>( display.width() ) / fheroes2::Display::DEFAULT_WIDTH;
-    const double scaleY = static_cast<double>( display.height() ) / fheroes2::Display::DEFAULT_HEIGHT;
-    const fheroes2::Rect settingsArea( static_cast<int32_t>( 63 * scaleX ), static_cast<int32_t>( 202 * scaleY ), static_cast<int32_t>( 90 * scaleX ),
-                                       static_cast<int32_t>( 160 * scaleY ) );
+    const fheroes2::Rect settingsArea( offX + 63 * display.scaleFactor(), offY + 202 * display.scaleFactor(), offX + 90 * display.scaleFactor(),
+                                       offY + 160 * display.scaleFactor() );
+    fheroes2::DrawRect( display, settingsArea, 240 );
 
     uint32_t lantern_frame = 0;
 
@@ -364,7 +363,7 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
             ++lantern_frame;
             fheroes2::Blit( lantern12, display, offX + lantern12.x(), offY + lantern12.y() );
             if ( le.MouseCursor( settingsArea ) ) {
-                const int32_t offsetY = static_cast<int32_t>( 55 * scaleY );
+                const int32_t offsetY = static_cast<int32_t>( 55 * display.scaleFactor() );
                 fheroes2::Blit( highlightDoor, 0, offsetY, display, offX + highlightDoor.x(), offY + highlightDoor.y() + offsetY, highlightDoor.width(),
                                 highlightDoor.height() );
             }
