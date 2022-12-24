@@ -3433,6 +3433,12 @@ namespace fheroes2
                     Sprite scaled( original.width() * displayScaleFactor / imgScaleFactor, original.height() * displayScaleFactor / imgScaleFactor );
                     // TODO: set sprite scale factor!
                     scaled.setPosition( original.x() * displayScaleFactor / imgScaleFactor, original.y() * displayScaleFactor / imgScaleFactor );
+
+                    // TODO: is there a better way for this?
+                    if ( original.singleLayer() ) {
+                        scaled._disableTransformLayer();
+                    }
+
                     Resize( original, scaled, false );
                     _icnVsSprite[id][i] = scaled;
                 }
