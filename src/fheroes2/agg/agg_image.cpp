@@ -38,11 +38,13 @@
 #include "icn.h"
 #include "image.h"
 #include "image_tool.h"
+#include "logging.h"
 #include "math_base.h"
 #include "pal.h"
 #include "rand.h"
 #include "screen.h"
 #include "serialize.h"
+#include "system.h"
 #include "text.h"
 #include "til.h"
 #include "tools.h"
@@ -511,9 +513,56 @@ namespace fheroes2
 {
     namespace AGG
     {
+        bool LoadImagesFromDir( const int id, const std::string & pathToImagesDir )
+        {
+            std::string pathToImagesSpec = System::concatPath( pathToImagesDir, "spec.txt" );
+
+            FILE * const f = fopen( pathToImagesSpec.c_str(), "r" );
+            if ( nullptr == f ) {
+                return false;
+            }
+
+            int count;
+            if ( fscanf( f, "%d", &count ) != 1 ) {
+                DEBUG_LOG( DBG_ENGINE, DBG_WARN, "failed to parse image count from: " << pathToImagesSpec );
+                fclose( f );
+                return false;
+            }
+
+            _icnVsSprite[id].resize( count );
+
+            for ( int i = 0; i < count; ++i ) {
+                int offsetX;
+                int offsetY;
+                if ( fscanf( f, "%d %d", &offsetX, &offsetY ) != 2 ) {
+                    DEBUG_LOG( DBG_ENGINE, DBG_WARN, "failed to parse sprite offsets from: " << pathToImagesSpec << ":" << i );
+                    fclose( f );
+                    return false;
+                }
+                _icnVsSprite[id][i].setPosition( offsetX, offsetY );
+
+                char fname[16];
+                snprintf( fname, 16, "%03d.png", i );
+                fheroes2::Load( System::concatPath( pathToImagesDir, fname ), _icnVsSprite[id][i] );
+            }
+
+            fclose( f );
+
+            return true;
+        }
+
         void LoadOriginalICN( int id )
         {
-            const std::vector<uint8_t> & body = ::AGG::getDataFromAggFile( ICN::GetString( id ) );
+            const char * icnString = ICN::GetString( id );
+
+            if ( LoadImagesFromDir( id, System::concatPath( System::concatPath( System::GetDataDirectory( "fheroes2" ), "AGG" ), icnString ) ) ) {
+                return;
+            }
+            if ( LoadImagesFromDir( id, System::concatPath( System::concatPath( System::GetDataDirectory( "fheroes2" ), "AGGX" ), icnString ) ) ) {
+                return;
+            }
+
+            const std::vector<uint8_t> & body = ::AGG::getDataFromAggFile( icnString );
 
             if ( body.empty() ) {
                 return;
@@ -3439,8 +3488,10 @@ namespace fheroes2
 
             Sprite & resizedIcn = _icnVsScaledSprite[icnId][index];
 
-            const double scaleFactorX = static_cast<double>( Display::instance().width() ) / Display::DEFAULT_WIDTH;
-            const double scaleFactorY = static_cast<double>( Display::instance().height() ) / Display::DEFAULT_HEIGHT;
+            const int32_t originalWidth = icnId == ICN::HEROES ? originalIcn.width() : Display::DEFAULT_WIDTH;
+            const int32_t originalHeight = icnId == ICN::HEROES ? originalIcn.height() : Display::DEFAULT_HEIGHT;
+            const double scaleFactorX = static_cast<double>( Display::instance().width() ) / originalWidth;
+            const double scaleFactorY = static_cast<double>( Display::instance().height() ) / originalHeight;
 
             const int32_t resizedWidth = static_cast<int32_t>( originalIcn.width() * scaleFactorX + 0.5 );
             const int32_t resizedHeight = static_cast<int32_t>( originalIcn.height() * scaleFactorY + 0.5 );

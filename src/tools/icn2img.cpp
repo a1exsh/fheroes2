@@ -110,8 +110,8 @@ int main( int argc, char ** argv )
                 dstfile += ".bmp";
             }
 
-            std::cout << "Image " << ii + 1 << " has offset of [" << static_cast<int32_t>( head.offsetX ) << ", " << static_cast<int32_t>( head.offsetY ) << "]"
-                      << std::endl;
+            std::cout << "Image " << ii + 1 << " has offset of [" << static_cast<int32_t>( head.offsetX ) << ", " << static_cast<int32_t>( head.offsetY ) << "] "
+                      << dstfile << std::endl;
 
             fheroes2::Save( image, dstfile, 23 );
         }
