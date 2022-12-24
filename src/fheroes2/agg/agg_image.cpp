@@ -63,8 +63,6 @@ namespace
 
     const uint32_t headerSize = 6;
 
-    std::map<int, std::vector<fheroes2::Sprite>> _icnVsScaledSprite;
-
     // Some resources are language dependent. These are mostly buttons with a text of them.
     // Once a user changes a language we have to update resources. To do this we need to clear the existing images.
 
@@ -513,7 +511,7 @@ namespace fheroes2
 {
     namespace AGG
     {
-        bool LoadImagesFromDir( const int id, const std::string & pathToImagesDir )
+        bool LoadImagesFromDir( const int id, const std::string & pathToImagesDir, int32_t scaleFactor )
         {
             std::string pathToImagesSpec = System::concatPath( pathToImagesDir, "spec.txt" );
 
@@ -543,7 +541,7 @@ namespace fheroes2
 
                 char fname[16];
                 snprintf( fname, 16, "%03d.png", i );
-                fheroes2::Load( System::concatPath( pathToImagesDir, fname ), _icnVsSprite[id][i] );
+                fheroes2::Load( System::concatPath( pathToImagesDir, fname ), _icnVsSprite[id][i], scaleFactor );
             }
 
             fclose( f );
@@ -551,21 +549,24 @@ namespace fheroes2
             return true;
         }
 
-        void LoadOriginalICN( int id )
+        bool LoadOriginalICN( int id )
         {
             const char * icnString = ICN::GetString( id );
 
-            if ( LoadImagesFromDir( id, System::concatPath( System::concatPath( System::GetDataDirectory( "fheroes2" ), "AGG" ), icnString ) ) ) {
-                return;
+            const int32_t SCALE_FACTOR_FULLHD = 4;
+            const std::string fullHdPath = System::concatPath( System::GetDataDirectory( "fheroes2" ), "fullhd" );
+
+            if ( LoadImagesFromDir( id, System::concatPath( System::concatPath( fullHdPath, "AGG" ), icnString ), SCALE_FACTOR_FULLHD ) ) {
+                return true;
             }
-            if ( LoadImagesFromDir( id, System::concatPath( System::concatPath( System::GetDataDirectory( "fheroes2" ), "AGGX" ), icnString ) ) ) {
-                return;
+            if ( LoadImagesFromDir( id, System::concatPath( System::concatPath( fullHdPath, "AGGX" ), icnString ), SCALE_FACTOR_FULLHD ) ) {
+                return true;
             }
 
             const std::vector<uint8_t> & body = ::AGG::getDataFromAggFile( icnString );
 
             if ( body.empty() ) {
-                return;
+                return false;
             }
 
             StreamBuf imageStream( body );
@@ -573,7 +574,7 @@ namespace fheroes2
             const uint32_t count = imageStream.getLE16();
             const uint32_t blockSize = imageStream.getLE32();
             if ( count == 0 || blockSize == 0 ) {
-                return;
+                return false;
             }
 
             _icnVsSprite[id].resize( count );
@@ -599,6 +600,8 @@ namespace fheroes2
                 _icnVsSprite[id][i]
                     = decodeICNSprite( data, sizeData, header1.width, header1.height, static_cast<int16_t>( header1.offsetX ), static_cast<int16_t>( header1.offsetY ) );
             }
+
+            return true;
         }
 
         // Helper function for LoadModifiedICN
@@ -3375,7 +3378,7 @@ namespace fheroes2
                     FillTransform( pressed, pressed.width() - 3, pressed.height() - 3, 1, 1, 1 );
                 }
 
-                break;
+                return true;
             }
             case ICN::EMPTY_GOOD_MEDIUM_BUTTON:
             case ICN::EMPTY_EVIL_MEDIUM_BUTTON: {
@@ -3401,7 +3404,7 @@ namespace fheroes2
                     Fill( pressed, 27, 16, 42, 27, getButtonFillingColor( false, isGoodInterface ) );
                 }
 
-                break;
+                return true;
             }
             default:
                 break;
@@ -3410,12 +3413,35 @@ namespace fheroes2
             return false;
         }
 
-        size_t GetMaximumICNIndex( int id )
+        void EnsureICNLoaded( int id )
         {
-            if ( _icnVsSprite[id].empty() && !LoadModifiedICN( id ) ) {
-                LoadOriginalICN( id );
+            if ( !_icnVsSprite[id].empty() ) {
+                return;
+            }
+            if ( !( LoadModifiedICN( id ) || LoadOriginalICN( id ) ) ) {
+                _icnVsSprite[id].resize( 1 );
+                _icnVsSprite[id][0] = errorImage;
+                return;
             }
 
+            const int32_t imgScaleFactor = _icnVsSprite[id][0].scaleFactor();
+            const int32_t displayScaleFactor = Display::instance().scaleFactor();
+            if ( imgScaleFactor != displayScaleFactor ) {
+                for ( size_t i = 0; i < _icnVsSprite[id].size(); ++i ) {
+                    const Sprite & original = _icnVsSprite[id][i];
+                    // resize the image to match the display's scale factor
+                    Sprite scaled( original.width() * displayScaleFactor / imgScaleFactor, original.height() * displayScaleFactor / imgScaleFactor );
+                    // TODO: set sprite scale factor!
+                    scaled.setPosition( original.x() * displayScaleFactor / imgScaleFactor, original.y() * displayScaleFactor / imgScaleFactor );
+                    Resize( original, scaled, false );
+                    _icnVsSprite[id][i] = scaled;
+                }
+            }
+        }
+
+        size_t GetMaximumICNIndex( int id )
+        {
+            EnsureICNLoaded( id );
             return _icnVsSprite[id].size();
         }
 
@@ -3468,43 +3494,6 @@ namespace fheroes2
             return _tilVsImage[id][0].size();
         }
 
-        // We have few ICNs which we need to scale like some related to main screen
-        bool IsScalableICN( int id )
-        {
-            return id == ICN::HEROES || id == ICN::BTNSHNGL || id == ICN::SHNGANIM;
-        }
-
-        const Sprite & GetScaledICN( int icnId, uint32_t index )
-        {
-            const Sprite & originalIcn = _icnVsSprite[icnId][index];
-
-            if ( Display::DEFAULT_WIDTH == Display::instance().width() && Display::DEFAULT_HEIGHT == Display::instance().height() ) {
-                return originalIcn;
-            }
-
-            if ( _icnVsScaledSprite[icnId].empty() ) {
-                _icnVsScaledSprite[icnId].resize( _icnVsSprite[icnId].size() );
-            }
-
-            Sprite & resizedIcn = _icnVsScaledSprite[icnId][index];
-
-            const int32_t originalWidth = icnId == ICN::HEROES ? originalIcn.width() : Display::DEFAULT_WIDTH;
-            const int32_t originalHeight = icnId == ICN::HEROES ? originalIcn.height() : Display::DEFAULT_HEIGHT;
-            const double scaleFactorX = static_cast<double>( Display::instance().width() ) / originalWidth;
-            const double scaleFactorY = static_cast<double>( Display::instance().height() ) / originalHeight;
-
-            const int32_t resizedWidth = static_cast<int32_t>( originalIcn.width() * scaleFactorX + 0.5 );
-            const int32_t resizedHeight = static_cast<int32_t>( originalIcn.height() * scaleFactorY + 0.5 );
-            // Resize only if needed
-            if ( resizedIcn.width() != resizedWidth || resizedIcn.height() != resizedHeight ) {
-                resizedIcn.resize( resizedWidth, resizedHeight );
-                resizedIcn.setPosition( static_cast<int32_t>( originalIcn.x() * scaleFactorX + 0.5 ), static_cast<int32_t>( originalIcn.y() * scaleFactorY + 0.5 ) );
-                Resize( originalIcn, resizedIcn, false );
-            }
-
-            return resizedIcn;
-        }
-
         const Sprite & GetICN( int icnId, uint32_t index )
         {
             if ( !IsValidICNId( icnId ) ) {
@@ -3513,10 +3502,6 @@ namespace fheroes2
 
             if ( index >= GetMaximumICNIndex( icnId ) ) {
                 return errorImage;
-            }
-
-            if ( IsScalableICN( icnId ) ) {
-                return GetScaledICN( icnId, index );
             }
 
             return _icnVsSprite[icnId][index];

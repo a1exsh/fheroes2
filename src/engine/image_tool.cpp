@@ -162,7 +162,7 @@ namespace fheroes2
         return SaveImage( image, path );
     }
 
-    bool Load( const std::string & path, Image & image )
+    bool Load( const std::string & path, Image & image, int32_t scaleFactor )
     {
         SDL_Surface * surface = IMG_Load( path.c_str() );
         if ( surface == nullptr ) {
@@ -170,7 +170,7 @@ namespace fheroes2
         }
 
         if ( surface->format->BytesPerPixel == 3 ) {
-            image.resize( surface->w, surface->h );
+            image.resize( surface->w, surface->h, scaleFactor );
             memset( image.transform(), 0, surface->w * surface->h );
 
             const uint8_t * inY = reinterpret_cast<uint8_t *>( surface->pixels );
@@ -189,7 +189,7 @@ namespace fheroes2
             }
         }
         else if ( surface->format->BytesPerPixel == 4 ) {
-            image.resize( surface->w, surface->h );
+            image.resize( surface->w, surface->h, scaleFactor );
             image.reset();
 
             const uint8_t * inY = reinterpret_cast<uint8_t *>( surface->pixels );

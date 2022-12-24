@@ -36,6 +36,7 @@ namespace fheroes2
     public:
         Image();
         Image( int32_t width_, int32_t height_ );
+        Image( int32_t width_, int32_t height_, int32_t scaleFactor_ );
         Image( const Image & image_ );
         Image( Image && image_ ) noexcept;
 
@@ -44,7 +45,12 @@ namespace fheroes2
         Image & operator=( const Image & image_ );
         Image & operator=( Image && image_ ) noexcept;
 
-        virtual void resize( int32_t width_, int32_t height_ );
+        void resize( int32_t width_, int32_t height_ )
+        {
+            resize( width_, height_, _scaleFactor );
+        }
+
+        virtual void resize( int32_t width_, int32_t height_, int32_t scaleFactor_ );
 
         // It's safe to cast to uint32_t as width and height are always >= 0
         int32_t width() const
@@ -55,6 +61,11 @@ namespace fheroes2
         int32_t height() const
         {
             return _height;
+        }
+
+        int32_t scaleFactor() const
+        {
+            return _scaleFactor;
         }
 
         virtual uint8_t * image();
@@ -99,6 +110,7 @@ namespace fheroes2
 
         int32_t _width;
         int32_t _height;
+        int32_t _scaleFactor;
         std::unique_ptr<uint8_t[]> _data; // holds 2 image layers
 
         bool _singleLayer; // only for images which are not used for any other operations except displaying on screen. Non-copyable member.

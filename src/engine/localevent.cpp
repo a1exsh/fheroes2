@@ -1687,7 +1687,7 @@ void LocalEvent::HandleRenderDeviceResetEvent()
 
     fheroes2::Copy( display, temp );
     display.release();
-    display.resize( temp.width(), temp.height() );
+    display.resize( temp.width(), temp.height(), temp.scaleFactor() ); // FIXME: why 3rd arg is required?
     fheroes2::Copy( temp, display );
 }
 #else

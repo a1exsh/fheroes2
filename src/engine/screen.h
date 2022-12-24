@@ -159,7 +159,7 @@ namespace fheroes2
         // Update the area which will be rendered on the next render() call.
         void updateNextRenderRoi( const Rect & roi );
 
-        void resize( int32_t width_, int32_t height_ ) override;
+        void resize( int32_t width_, int32_t height_, int32_t scaleFactor_ ) override;
 
         bool isDefaultSize() const
         {

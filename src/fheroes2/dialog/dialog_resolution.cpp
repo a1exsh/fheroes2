@@ -231,7 +231,7 @@ namespace Dialog
 
         if ( selectedResolution.width > 0 && selectedResolution.height > 0
              && ( selectedResolution.width != currentResolution.width || selectedResolution.height != currentResolution.height ) ) {
-            display.resize( selectedResolution.width, selectedResolution.height );
+            display.resize( selectedResolution.width, selectedResolution.height, 1 ); // FIXME: scaleFactor
 
 #if !defined( MACOS_APP_BUNDLE )
             const fheroes2::Image & appIcon = CreateImageFromZlib( 32, 32, iconImage, sizeof( iconImage ), true );

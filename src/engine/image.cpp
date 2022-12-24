@@ -417,6 +417,7 @@ namespace fheroes2
     Image::Image()
         : _width( 0 )
         , _height( 0 )
+        , _scaleFactor( 1 )
         , _singleLayer( false )
     {
         // Do nothing.
@@ -425,14 +426,25 @@ namespace fheroes2
     Image::Image( int32_t width_, int32_t height_ )
         : _width( 0 )
         , _height( 0 )
+        , _scaleFactor( 1 )
         , _singleLayer( false )
     {
         Image::resize( width_, height_ );
     }
 
+    Image::Image( int32_t width_, int32_t height_, int32_t scaleFactor_ )
+        : _width( 0 )
+        , _height( 0 )
+        , _scaleFactor( 1 )
+        , _singleLayer( false )
+    {
+        Image::resize( width_, height_, scaleFactor_ );
+    }
+
     Image::Image( const Image & image_ )
         : _width( 0 )
         , _height( 0 )
+        , _scaleFactor( 1 )
         , _singleLayer( false )
     {
         copy( image_ );
@@ -441,12 +453,14 @@ namespace fheroes2
     Image::Image( Image && image_ ) noexcept
         : _width( 0 )
         , _height( 0 )
+        , _scaleFactor( 1 )
         , _data( std::move( image_._data ) )
         , _singleLayer( false )
     {
         std::swap( _singleLayer, image_._singleLayer );
         std::swap( _width, image_._width );
         std::swap( _height, image_._height );
+        std::swap( _scaleFactor, image_._scaleFactor );
     }
 
     Image & Image::operator=( const Image & image_ )
@@ -466,6 +480,7 @@ namespace fheroes2
 
             std::swap( _width, image_._width );
             std::swap( _height, image_._height );
+            std::swap( _scaleFactor, image_._scaleFactor );
             std::swap( _data, image_._data );
         }
 
@@ -488,6 +503,7 @@ namespace fheroes2
 
         _width = 0;
         _height = 0;
+        _scaleFactor = 1;
     }
 
     void Image::fill( uint8_t value )
@@ -499,8 +515,9 @@ namespace fheroes2
         }
     }
 
-    void Image::resize( int32_t width_, int32_t height_ )
+    void Image::resize( int32_t width_, int32_t height_, int32_t scaleFactor_ )
     {
+        // TODO: how to handle the scale factor?
         if ( width_ == _width && height_ == _height ) {
             return;
         }
@@ -517,6 +534,7 @@ namespace fheroes2
 
         _width = width_;
         _height = height_;
+        _scaleFactor = scaleFactor_;
     }
 
     void Image::reset()
@@ -546,6 +564,7 @@ namespace fheroes2
 
             _width = image._width;
             _height = image._height;
+            _scaleFactor = image._scaleFactor;
         }
 
         memcpy( _data.get(), image._data.get(), size * 2 );

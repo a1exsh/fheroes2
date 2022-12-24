@@ -127,7 +127,7 @@ namespace
 
             fheroes2::Display & display = fheroes2::Display::instance();
 
-            display.resize( conf.VideoMode().width, conf.VideoMode().height );
+            display.resize( conf.VideoMode().width, conf.VideoMode().height, 1 ); // FIXME: scaleFactor
             display.fill( 0 ); // start from a black screen
 
             fheroes2::engine().setTitle( GetCaption() );

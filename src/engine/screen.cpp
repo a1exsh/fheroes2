@@ -1475,7 +1475,7 @@ namespace fheroes2
         _disableTransformLayer();
     }
 
-    void Display::resize( int32_t width_, int32_t height_ )
+    void Display::resize( int32_t width_, int32_t height_, int32_t /*scaleFactor_*/ )
     {
         if ( width() > 0 && height() > 0 && width_ == width() && height_ == height() ) // nothing to resize
             return;
@@ -1492,7 +1492,9 @@ namespace fheroes2
             clear();
         }
 
-        Image::resize( width_, height_ );
+        int32_t scaleFactor = std::max( 1, std::min( width_ / fheroes2::Display::DEFAULT_WIDTH, height_ / fheroes2::Display::DEFAULT_HEIGHT ) );
+
+        Image::resize( width_, height_, scaleFactor );
 
         // To detect some UI artifacts by invalid code let's put all transform data into pixel skipping mode.
         std::fill( transform(), transform() + width() * height(), static_cast<uint8_t>( 1 ) );
