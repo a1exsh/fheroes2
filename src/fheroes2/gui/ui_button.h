@@ -89,13 +89,13 @@ namespace fheroes2
             _offsetY = offsetY_;
         }
 
-        bool draw( Image & output = Display::instance() ) const; // will draw on screen by default
+        bool draw( AbstractDisplay & output = Display::instance() ) const; // will draw on screen by default
 
         // Will draw on screen by default. Returns true in case of state change. This method calls render() internally.
-        bool drawOnPress( Display & output = Display::instance() );
+        bool drawOnPress( AbstractDisplay & output = Display::instance() );
 
         // Will draw on screen by default. Returns true in case of state change. This method calls render() internally.
-        bool drawOnRelease( Display & output = Display::instance() );
+        bool drawOnRelease( AbstractDisplay & output = Display::instance() );
 
         Rect area() const;
 
@@ -177,7 +177,7 @@ namespace fheroes2
         void createButton( int32_t offsetX, int32_t offsetY, const Sprite & released, const Sprite & pressed, int returnValue );
         void addButton( ButtonSprite && button, int returnValue );
 
-        void draw( Image & area = Display::instance() ) const; // will draw on screen by default
+        void draw( AbstractDisplay & output = Display::instance() ) const; // will draw on screen by default
 
         // Make sure that id is less than size!
         ButtonBase & button( size_t id );
@@ -199,7 +199,7 @@ namespace fheroes2
     class ButtonRestorer
     {
     public:
-        explicit ButtonRestorer( ButtonBase & button, Image & area = Display::instance() );
+        explicit ButtonRestorer( ButtonBase & button, AbstractDisplay & display = Display::instance() );
         ButtonRestorer( const ButtonRestorer & ) = delete;
 
         ~ButtonRestorer();
@@ -208,7 +208,7 @@ namespace fheroes2
 
     private:
         ButtonBase & _button;
-        Image & _area;
+        AbstractDisplay & _display;
         bool _isDisabled;
     };
 
@@ -217,7 +217,7 @@ namespace fheroes2
     public:
         void addButton( ButtonBase * button );
 
-        void draw( Image & area = Display::instance() ) const; // will draw on screen by default
+        void draw( AbstractDisplay & output = Display::instance() ) const; // will draw on screen by default
 
     protected:
         void senderUpdate( const ActionObject * sender ) override;

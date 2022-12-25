@@ -234,23 +234,25 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
     const int32_t offX = ( display.width() - background.width() ) / 2;
     const int32_t offY = ( display.height() - background.height() ) / 2;
 
-    fheroes2::Button buttonNewGame( offX, offY, ICN::BTNSHNGL, NEWGAME_DEFAULT, NEWGAME_DEFAULT + 2 );
-    fheroes2::Button buttonLoadGame( offX, offY, ICN::BTNSHNGL, LOADGAME_DEFAULT, LOADGAME_DEFAULT + 2 );
-    fheroes2::Button buttonHighScores( offX, offY, ICN::BTNSHNGL, HIGHSCORES_DEFAULT, HIGHSCORES_DEFAULT + 2 );
-    fheroes2::Button buttonCredits( offX, offY, ICN::BTNSHNGL, CREDITS_DEFAULT, CREDITS_DEFAULT + 2 );
-    fheroes2::Button buttonQuit( offX, offY, ICN::BTNSHNGL, QUIT_DEFAULT, QUIT_DEFAULT + 2 );
+    fheroes2::DisplayContext ctx = display.getContext( offX, offY );
+
+    fheroes2::Button buttonNewGame( 0, 0, ICN::BTNSHNGL, NEWGAME_DEFAULT, NEWGAME_DEFAULT + 2 );
+    fheroes2::Button buttonLoadGame( 0, 0, ICN::BTNSHNGL, LOADGAME_DEFAULT, LOADGAME_DEFAULT + 2 );
+    fheroes2::Button buttonHighScores( 0, 0, ICN::BTNSHNGL, HIGHSCORES_DEFAULT, HIGHSCORES_DEFAULT + 2 );
+    fheroes2::Button buttonCredits( 0, 0, ICN::BTNSHNGL, CREDITS_DEFAULT, CREDITS_DEFAULT + 2 );
+    fheroes2::Button buttonQuit( 0, 0, ICN::BTNSHNGL, QUIT_DEFAULT, QUIT_DEFAULT + 2 );
 
     const fheroes2::Sprite & lantern10 = fheroes2::AGG::GetICN( ICN::SHNGANIM, 0 );
-    fheroes2::Blit( lantern10, display, offX + lantern10.x(), offY + lantern10.y() );
+    fheroes2::Blit( lantern10, ctx, lantern10.x(), lantern10.y() );
 
     const fheroes2::Sprite & lantern11 = fheroes2::AGG::GetICN( ICN::SHNGANIM, ICN::AnimationFrame( ICN::SHNGANIM, 0, 0 ) );
-    fheroes2::Blit( lantern11, display, offX + lantern11.x(), offY + lantern11.y() );
+    fheroes2::Blit( lantern11, ctx, lantern11.x(), lantern11.y() );
 
-    buttonNewGame.draw();
-    buttonLoadGame.draw();
-    buttonHighScores.draw();
-    buttonCredits.draw();
-    buttonQuit.draw();
+    buttonNewGame.draw( ctx );
+    buttonLoadGame.draw( ctx );
+    buttonHighScores.draw( ctx );
+    buttonCredits.draw( ctx );
+    buttonQuit.draw( ctx );
 
     display.render();
 
@@ -289,10 +291,10 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
             buttons[i].wasOver = buttons[i].isOver;
 
             if ( le.MousePressLeft( buttons[i].button.area() ) ) {
-                buttons[i].button.drawOnPress();
+                buttons[i].button.drawOnPress( ctx );
             }
             else {
-                buttons[i].button.drawOnRelease();
+                buttons[i].button.drawOnRelease( ctx );
             }
 
             buttons[i].isOver = le.MouseCursor( buttons[i].button.area() );

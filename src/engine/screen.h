@@ -134,7 +134,15 @@ namespace fheroes2
         bool _nearestScaling;
     };
 
-    class Display : public Image
+    // A drawable that knows how to render itself on the screen.
+    class AbstractDisplay : public virtual AbstractDrawable
+    {
+    public:
+        virtual void render() = 0;
+        virtual void render( const Rect & roi ) = 0;
+    };
+
+    class Display : public AbstractDisplay, public Image
     {
     public:
         friend class BaseRenderEngine;
@@ -150,12 +158,13 @@ namespace fheroes2
         ~Display() override = default;
 
         // Render a full frame on screen.
-        void render()
+        void render() override
         {
-            render( { 0, 0, width(), height() } );
+            render( { 0, 0, Image::width(), Image::height() } );
         }
 
-        void render( const Rect & roi ); // render a part of image on screen. Prefer this method over full image if you don't draw full screen.
+        // render a part of image on screen. Prefer this method over full image if you don't draw full screen.
+        void render( const Rect & roi ) override;
 
         // Update the area which will be rendered on the next render() call.
         void updateNextRenderRoi( const Rect & roi );
@@ -164,7 +173,7 @@ namespace fheroes2
 
         bool isDefaultSize() const
         {
-            return width() == DEFAULT_WIDTH && height() == DEFAULT_HEIGHT;
+            return Image::width() == DEFAULT_WIDTH && Image::height() == DEFAULT_HEIGHT;
         }
 
         // this function must return true if new palette has been generated
@@ -214,15 +223,39 @@ namespace fheroes2
         void _renderFrame( const Rect & roi ) const; // prepare and render a frame
     };
 
-    class DisplayContext : public Drawable
+    class DisplayContext : public AbstractDisplay
     {
     public:
         DisplayContext( Display & display, int32_t x, int32_t y )
-            : Drawable( display )
-            , _display( display )
+            : _display( display )
             , _x( std::max( 0, std::min( x, display.width() - 1 ) ) )
             , _y( std::max( 0, std::min( y, display.height() - 1 ) ) )
         {}
+
+        int32_t width() const override
+        {
+            return _display.width();
+        }
+
+        int32_t height() const override
+        {
+            return _display.height();
+        }
+
+        int32_t scaleFactor() const override
+        {
+            return _display.scaleFactor();
+        }
+
+        bool singleLayer() const override
+        {
+            return _display.singleLayer(); // actually should be always true
+        }
+
+        bool empty() const override
+        {
+            return _display.empty();
+        }
 
         uint8_t * image() override
         {
@@ -242,6 +275,16 @@ namespace fheroes2
         const uint8_t * transform() const override
         {
             return _display.transform() + _x + _y * _display.width();
+        }
+
+        void render() override
+        {
+            _display.render();
+        }
+
+        void render( const Rect & roi ) override
+        {
+            _display.render( roi );
         }
 
         // int32_t x() const

@@ -206,7 +206,7 @@ namespace
         return true;
     }
 
-    bool Verify( const fheroes2::Drawable & image, int32_t & x, int32_t & y, int32_t & width, int32_t & height )
+    bool Verify( const fheroes2::AbstractDrawable & image, int32_t & x, int32_t & y, int32_t & width, int32_t & height )
     {
         if ( image.empty() || width <= 0 || height <= 0 ) // what's the reason to work with empty images?
             return false;
@@ -315,8 +315,8 @@ namespace
         return true;
     }
 
-    bool Verify( const fheroes2::Drawable & in, int32_t & inX, int32_t & inY, const fheroes2::Drawable & out, int32_t & outX, int32_t & outY, int32_t & width,
-                 int32_t & height )
+    bool Verify( const fheroes2::AbstractDrawable & in, int32_t & inX, int32_t & inY, const fheroes2::AbstractDrawable & out, int32_t & outX, int32_t & outY,
+                 int32_t & width, int32_t & height )
     {
         return Verify( inX, inY, outX, outY, width, height, in.width(), in.height(), out.width(), out.height() );
     }
@@ -977,17 +977,17 @@ namespace fheroes2
         }
     }
 
-    void Blit( const Drawable & in, Drawable & out, bool flip )
+    void Blit( const AbstractDrawable & in, AbstractDrawable & out, bool flip )
     {
         Blit( in, 0, 0, out, 0, 0, in.width(), in.height(), flip );
     }
 
-    void Blit( const Drawable & in, Drawable & out, int32_t outX, int32_t outY, bool flip )
+    void Blit( const AbstractDrawable & in, AbstractDrawable & out, int32_t outX, int32_t outY, bool flip )
     {
         Blit( in, 0, 0, out, outX, outY, in.width(), in.height(), flip );
     }
 
-    void Blit( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip )
+    void Blit( const AbstractDrawable & in, int32_t inX, int32_t inY, AbstractDrawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip )
     {
         if ( in.singleLayer() && out.singleLayer() && !flip ) {
             Copy( in, inX, inY, out, outX, outY, width, height );
@@ -1113,7 +1113,7 @@ namespace fheroes2
         }
     }
 
-    void Blit( const Drawable & in, const Point & inPos, Drawable & out, const Point & outPos, const Size & size, bool flip )
+    void Blit( const AbstractDrawable & in, const Point & inPos, AbstractDrawable & out, const Point & outPos, const Size & size, bool flip )
     {
         if ( inPos.x < 0 || inPos.y < 0 )
             return;
@@ -1121,13 +1121,13 @@ namespace fheroes2
         Blit( in, inPos.x, inPos.y, out, outPos.x, outPos.y, size.width, size.height, flip );
     }
 
-    void Copy( const Drawable & in, Image & out )
+    void Copy( const AbstractDrawable & in, Image & out )
     {
         out.resize( in.width(), in.height() );
         Copy( in, 0, 0, out, 0, 0, in.width(), in.height() );
     }
 
-    void Copy( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height )
+    void Copy( const AbstractDrawable & in, int32_t inX, int32_t inY, AbstractDrawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height )
     {
         if ( !Verify( in, inX, inY, out, outX, outY, width, height ) ) {
             return;

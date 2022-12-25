@@ -29,7 +29,7 @@
 
 namespace fheroes2
 {
-    void drawSprite( Drawable & ctx, const int icnId, const uint32_t index )
+    void drawSprite( fheroes2::DisplayContext & ctx, const int icnId, const uint32_t index )
     {
         const Sprite & sprite = AGG::GetICN( icnId, index );
         Blit( sprite, 0, 0, ctx, sprite.x(), sprite.y(), sprite.width(), sprite.height() );

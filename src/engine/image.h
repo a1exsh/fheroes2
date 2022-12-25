@@ -28,7 +28,24 @@
 
 namespace fheroes2
 {
-    class Drawable
+    class AbstractDrawable
+    {
+    public:
+        // It's safe to cast to uint32_t as width and height are always >= 0
+        virtual int32_t width() const = 0;
+        virtual int32_t height() const = 0;
+        virtual int32_t scaleFactor() const = 0;
+        virtual bool singleLayer() const = 0;
+        virtual bool empty() const = 0;
+
+        virtual uint8_t * image() = 0;
+        virtual const uint8_t * image() const = 0;
+
+        virtual uint8_t * transform() = 0;
+        virtual const uint8_t * transform() const = 0;
+    };
+
+    class Drawable : public virtual AbstractDrawable
     {
     public:
         Drawable()
@@ -59,37 +76,30 @@ namespace fheroes2
             , _singleLayer( false )
         {}
 
-        // It's safe to cast to uint32_t as width and height are always >= 0
-        int32_t width() const
+        int32_t width() const override
         {
             return _width;
         }
 
-        int32_t height() const
+        int32_t height() const override
         {
             return _height;
         }
 
-        int32_t scaleFactor() const
+        int32_t scaleFactor() const override
         {
             return _scaleFactor;
         }
 
-        bool singleLayer() const
+        bool singleLayer() const override
         {
             return _singleLayer;
         }
 
-        virtual bool empty() const
+        bool empty() const override
         {
             return _width == 0 || _height == 0;
         }
-
-        virtual uint8_t * image() = 0;
-        virtual const uint8_t * image() const = 0;
-
-        virtual uint8_t * transform() = 0;
-        virtual const uint8_t * transform() const = 0;
 
     protected:
         int32_t _width;
@@ -263,15 +273,16 @@ namespace fheroes2
     void ApplyTransform( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId );
 
     // draw one image onto another
-    void Blit( const Drawable & in, Drawable & out, bool flip = false );
-    void Blit( const Drawable & in, Drawable & out, int32_t outX, int32_t outY, bool flip = false );
-    void Blit( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip = false );
+    void Blit( const AbstractDrawable & in, AbstractDrawable & out, bool flip = false );
+    void Blit( const AbstractDrawable & in, AbstractDrawable & out, int32_t outX, int32_t outY, bool flip = false );
+    void Blit( const AbstractDrawable & in, int32_t inX, int32_t inY, AbstractDrawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height,
+               bool flip = false );
 
     // inPos must contain non-negative values
-    void Blit( const Drawable & in, const Point & inPos, Drawable & out, const Point & outPos, const Size & size, bool flip = false );
+    void Blit( const AbstractDrawable & in, const Point & inPos, AbstractDrawable & out, const Point & outPos, const Size & size, bool flip = false );
 
-    void Copy( const Drawable & in, Image & out );
-    void Copy( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height );
+    void Copy( const AbstractDrawable & in, Image & out );
+    void Copy( const AbstractDrawable & in, int32_t inX, int32_t inY, AbstractDrawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height );
 
     // Copies transform the layer from in to out. Both images must be of the same size.
     void CopyTransformLayer( const Image & in, Image & out );

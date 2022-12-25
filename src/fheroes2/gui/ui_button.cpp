@@ -91,7 +91,7 @@ namespace fheroes2
         notifySubscriber();
     }
 
-    bool ButtonBase::draw( Image & output ) const
+    bool ButtonBase::draw( AbstractDisplay & output ) const
     {
         if ( !isVisible() ) {
             return false;
@@ -110,7 +110,7 @@ namespace fheroes2
         return true;
     }
 
-    bool ButtonBase::drawOnPress( Display & output )
+    bool ButtonBase::drawOnPress( AbstractDisplay & output )
     {
         if ( isPressed() ) {
             return false;
@@ -127,7 +127,7 @@ namespace fheroes2
         return true;
     }
 
-    bool ButtonBase::drawOnRelease( Display & output )
+    bool ButtonBase::drawOnRelease( AbstractDisplay & output )
     {
         if ( !isPressed() ) {
             return false;
@@ -307,10 +307,10 @@ namespace fheroes2
         _value.emplace_back( returnValue );
     }
 
-    void ButtonGroup::draw( Image & area ) const
+    void ButtonGroup::draw( AbstractDisplay & output ) const
     {
         for ( size_t i = 0; i < _button.size(); ++i ) {
-            _button[i]->draw( area );
+            _button[i]->draw( output );
         }
     }
 
@@ -356,14 +356,14 @@ namespace fheroes2
         return Dialog::ZERO;
     }
 
-    ButtonRestorer::ButtonRestorer( ButtonBase & button, Image & area )
+    ButtonRestorer::ButtonRestorer( ButtonBase & button, AbstractDisplay & display )
         : _button( button )
-        , _area( area )
+        , _display( display )
         , _isDisabled( button.isDisabled() )
     {
         if ( !_isDisabled ) {
             _button.disable();
-            _button.draw( _area );
+            _button.draw( _display );
         }
     }
 
@@ -371,7 +371,7 @@ namespace fheroes2
     {
         if ( !_isDisabled ) {
             _button.enable();
-            _button.draw( _area );
+            _button.draw( _display );
         }
     }
 
@@ -384,10 +384,10 @@ namespace fheroes2
         button->subscribe( this );
     }
 
-    void OptionButtonGroup::draw( Image & area ) const
+    void OptionButtonGroup::draw( AbstractDisplay & output ) const
     {
         for ( size_t i = 0; i < _button.size(); ++i ) {
-            _button[i]->draw( area );
+            _button[i]->draw( output );
         }
     }
 
