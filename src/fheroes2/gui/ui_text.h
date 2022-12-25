@@ -24,11 +24,11 @@
 #include <string>
 #include <vector>
 
+#include "image.h"
+
 namespace fheroes2
 {
-    class Image;
     // TODO: the old Text classes render text with 2 pixel shift by Y axis. We need to do something to keep the same drawings while replacing old code.
-
     enum class FontSize : uint8_t
     {
         SMALL,
@@ -106,10 +106,10 @@ namespace fheroes2
         virtual int32_t rows( const int32_t maxWidth ) const = 0;
 
         // Draw text as a single line text.
-        virtual void draw( const int32_t x, const int32_t y, Image & output ) const = 0;
+        virtual void draw( const int32_t x, const int32_t y, AbstractDrawable & output ) const = 0;
 
         // Draw text as a multi-line limited by width of a line. The text will be centered according to the provided maximum width.
-        virtual void draw( const int32_t x, const int32_t y, const int32_t maxWidth, Image & output ) const = 0;
+        virtual void draw( const int32_t x, const int32_t y, const int32_t maxWidth, AbstractDrawable & output ) const = 0;
 
         // Returns true if nothing to draw.
         virtual bool empty() const = 0;
@@ -141,8 +141,8 @@ namespace fheroes2
 
         int32_t rows( const int32_t maxWidth ) const override;
 
-        void draw( const int32_t x, const int32_t y, Image & output ) const override;
-        void draw( const int32_t x, const int32_t y, const int32_t maxWidth, Image & output ) const override;
+        void draw( const int32_t x, const int32_t y, AbstractDrawable & output ) const override;
+        void draw( const int32_t x, const int32_t y, const int32_t maxWidth, AbstractDrawable & output ) const override;
 
         bool empty() const override;
 
@@ -177,8 +177,8 @@ namespace fheroes2
 
         int32_t rows( const int32_t maxWidth ) const override;
 
-        void draw( const int32_t x, const int32_t y, Image & output ) const override;
-        void draw( const int32_t x, const int32_t y, const int32_t maxWidth, Image & output ) const override;
+        void draw( const int32_t x, const int32_t y, AbstractDrawable & output ) const override;
+        void draw( const int32_t x, const int32_t y, const int32_t maxWidth, AbstractDrawable & output ) const override;
 
         bool empty() const override;
 

@@ -44,13 +44,20 @@
 
 namespace
 {
-    void drawDialog( const std::vector<fheroes2::Rect> & rects )
-    {
-        assert( rects.size() == 4 );
+    const fheroes2::Size offsetBetweenOptions{ 118, 110 };
 
+    const fheroes2::Point optionOffset{ 69, 47 };
+    const int32_t optionWindowSize{ 65 };
+
+    const fheroes2::Rect musicVolumeRoi{ optionOffset.x, optionOffset.y, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect soundVolumeRoi{ optionOffset.x + offsetBetweenOptions.width, optionOffset.y, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect musicTypeRoi{ optionOffset.x, optionOffset.y + offsetBetweenOptions.height, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect audio3DRoi{ optionOffset.x + offsetBetweenOptions.width, optionOffset.y + offsetBetweenOptions.height, optionWindowSize, optionWindowSize };
+
+    void drawMusicVolume( fheroes2::DisplayContext & ctx )
+    {
         const Settings & conf = Settings::Get();
 
-        // Music volume.
         const fheroes2::Sprite & musicVolumeIcon = fheroes2::AGG::GetICN( ICN::SPANEL, Audio::isValid() ? 1 : 0 );
         std::string value;
         if ( Audio::isValid() && conf.MusicVolume() ) {
@@ -60,10 +67,15 @@ namespace
             value = _( "off" );
         }
 
-        fheroes2::drawOption( rects[0], musicVolumeIcon, _( "Music" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, musicVolumeRoi, musicVolumeIcon, _( "Music" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+    }
 
-        // Sound volume.
+    void drawSoundVolume( fheroes2::DisplayContext & ctx )
+    {
+        const Settings & conf = Settings::Get();
+
         const fheroes2::Sprite & soundVolumeOption = fheroes2::AGG::GetICN( ICN::SPANEL, Audio::isValid() ? 3 : 2 );
+        std::string value;
         if ( Audio::isValid() && conf.SoundVolume() ) {
             value = std::to_string( conf.SoundVolume() );
         }
@@ -71,11 +83,16 @@ namespace
             value = _( "off" );
         }
 
-        fheroes2::drawOption( rects[1], soundVolumeOption, _( "Effects" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, soundVolumeRoi, soundVolumeOption, _( "Effects" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+    }
 
-        // Music Type.
+    void drawMusicType( fheroes2::DisplayContext & ctx )
+    {
+        const Settings & conf = Settings::Get();
+
         const MusicSource musicType = conf.MusicType();
         const fheroes2::Sprite & musicTypeIcon = fheroes2::AGG::GetICN( ICN::SPANEL, musicType == MUSIC_EXTERNAL ? 11 : 10 );
+        std::string value;
         if ( musicType == MUSIC_MIDI_ORIGINAL ) {
             value = _( "MIDI" );
         }
@@ -86,11 +103,16 @@ namespace
             value = _( "External" );
         }
 
-        fheroes2::drawOption( rects[2], musicTypeIcon, _( "Music Type" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, musicTypeRoi, musicTypeIcon, _( "Music Type" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+    }
 
-        // 3D Audio.
+    void drawAudio3D( fheroes2::DisplayContext & ctx )
+    {
+        const Settings & conf = Settings::Get();
+
         const bool is3DAudioEnabled = conf.is3DAudioEnabled();
         const fheroes2::Sprite & interfaceStateIcon = is3DAudioEnabled ? fheroes2::AGG::GetICN( ICN::SPANEL, 11 ) : fheroes2::AGG::GetICN( ICN::SPANEL, 10 );
+        std::string value;
         if ( is3DAudioEnabled ) {
             value = _( "On" );
         }
@@ -98,7 +120,7 @@ namespace
             value = _( "Off" );
         }
 
-        fheroes2::drawOption( rects[3], interfaceStateIcon, _( "3D Audio" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, audio3DRoi, interfaceStateIcon, _( "3D Audio" ), value, fheroes2::UiOptionTextWidth::TWO_ELEMENTS_ROW );
     }
 }
 
@@ -119,32 +141,25 @@ namespace Dialog
         const fheroes2::Point dialogOffset( ( display.width() - dialog.width() ) / 2, ( display.height() - dialog.height() ) / 2 );
         const fheroes2::Point shadowOffset( dialogOffset.x - BORDERWIDTH, dialogOffset.y );
 
-        fheroes2::ImageRestorer back( display, shadowOffset.x, shadowOffset.y, dialog.width() + BORDERWIDTH, dialog.height() + BORDERWIDTH );
-        const fheroes2::Rect dialogArea( dialogOffset.x, dialogOffset.y, dialog.width(), dialog.height() );
+        const fheroes2::Rect windowRoi{ dialogOffset.x, dialogOffset.y, dialog.width(), dialog.height() };
 
-        fheroes2::Fill( display, dialogArea.x, dialogArea.y, dialogArea.width, dialogArea.height, 0 );
-        fheroes2::Blit( dialogShadow, display, dialogArea.x - BORDERWIDTH, dialogArea.y + BORDERWIDTH );
-        fheroes2::Blit( dialog, display, dialogArea.x, dialogArea.y );
+        fheroes2::ImageRestorer restorer( display, shadowOffset.x, shadowOffset.y, dialog.width() + BORDERWIDTH, dialog.height() + BORDERWIDTH );
 
-        const fheroes2::Sprite & optionSprite = fheroes2::AGG::GetICN( ICN::SPANEL, 0 );
-        const fheroes2::Point optionOffset( 69 + dialogArea.x, 47 + dialogArea.y );
-        const fheroes2::Point optionStep( 118, 110 );
+        fheroes2::Fill( display, windowRoi.x, windowRoi.y, windowRoi.width, windowRoi.height, 0 );
+        fheroes2::Blit( dialogShadow, display, windowRoi.x - BORDERWIDTH, windowRoi.y + BORDERWIDTH );
+        fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
 
-        std::vector<fheroes2::Rect> roi;
-        roi.reserve( 4 );
-        roi.emplace_back( optionOffset.x, optionOffset.y, optionSprite.width(), optionSprite.height() );
-        roi.emplace_back( optionOffset.x + optionStep.x, optionOffset.y, optionSprite.width(), optionSprite.height() );
-        roi.emplace_back( optionOffset.x, optionOffset.y + optionStep.y, optionSprite.width(), optionSprite.height() );
-        roi.emplace_back( optionOffset.x + optionStep.x, optionOffset.y + optionStep.y, optionSprite.width(), optionSprite.height() );
+        fheroes2::DisplayContext ctx = display.getContext( windowRoi.x, windowRoi.y );
 
-        const fheroes2::Rect & musicVolumeRoi = roi[0];
-        const fheroes2::Rect & soundVolumeRoi = roi[1];
-        const fheroes2::Rect & musicTypeRoi = roi[2];
-        const fheroes2::Rect & audio3D = roi[3];
+        auto drawOptions = []( fheroes2::DisplayContext & c ) {
+            drawMusicVolume( c );
+            drawSoundVolume( c );
+            drawMusicType( c );
+            drawAudio3D( c );
+        };
+        drawOptions( ctx );
 
-        drawDialog( roi );
-
-        const fheroes2::Point buttonOffset( 112 + dialogArea.x, 252 + dialogArea.y );
+        const fheroes2::Point buttonOffset( 112 + windowRoi.x, 252 + windowRoi.y );
         fheroes2::Button buttonOkay( buttonOffset.x, buttonOffset.y, isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
         buttonOkay.draw();
 
@@ -194,7 +209,7 @@ namespace Dialog
                     conf.SetSoundVolume( conf.SoundVolume() - 1 );
                     saveSoundVolume = true;
                 }
-                if ( le.MouseClickLeft( audio3D ) ) {
+                if ( le.MouseClickLeft( audio3DRoi ) ) {
                     conf.set3DAudio( !conf.is3DAudioEnabled() );
                     saveSoundVolume = true;
                 }
@@ -230,7 +245,7 @@ namespace Dialog
             else if ( le.MousePressRight( musicTypeRoi ) ) {
                 fheroes2::showStandardTextMessage( _( "Music Type" ), _( "Change the type of music." ), 0 );
             }
-            else if ( le.MousePressRight( audio3D ) ) {
+            else if ( le.MousePressRight( audio3DRoi ) ) {
                 fheroes2::showStandardTextMessage( _( "3D Audio" ), _( "Toggle 3D effects of foreground sounds." ), 0 );
             }
             else if ( le.MousePressRight( buttonOkay.area() ) ) {
@@ -239,8 +254,8 @@ namespace Dialog
 
             if ( saveMusicVolume || saveSoundVolume || saveMusicType ) {
                 // redraw
-                fheroes2::Blit( dialog, display, dialogArea.x, dialogArea.y );
-                drawDialog( roi );
+                fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
+                drawOptions( ctx );
                 buttonOkay.draw();
                 display.render();
 

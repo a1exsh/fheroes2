@@ -35,19 +35,18 @@ namespace
 
 namespace fheroes2
 {
-    void drawOption( const Rect & optionRoi, const Sprite & icon, std::string titleText, std::string valueText, const int32_t textMaxWidth )
+    void drawOption( DisplayContext & ctx, const Rect & optionRoi, const Sprite & icon, std::string titleText, std::string valueText, const int32_t textMaxWidth )
     {
-        Display & display = Display::instance();
-
         const Text title( std::move( titleText ), FontType::smallWhite() );
         const Text name( std::move( valueText ), FontType::smallWhite() );
 
         // Calculate the text field left border position to horizontally align the text to the icon center.
         const int32_t textHorizontalOffset = optionRoi.x + ( icon.width() - textMaxWidth ) / 2;
 
-        title.draw( textHorizontalOffset, optionRoi.y - textVerticalOffset + title.height() - title.height( textMaxWidth ), textMaxWidth, display );
-        name.draw( textHorizontalOffset, optionRoi.y + optionRoi.height + nameVerticalOffset, textMaxWidth, display );
+        title.draw( ctx.scale( textHorizontalOffset ), ctx.scale( optionRoi.y - textVerticalOffset + title.height() - title.height( textMaxWidth ) ),
+                    ctx.scale( textMaxWidth ), ctx );
+        name.draw( ctx.scale( textHorizontalOffset ), ctx.scale( optionRoi.y + optionRoi.height + nameVerticalOffset ), ctx.scale( textMaxWidth ), ctx );
 
-        Blit( icon, 0, 0, display, optionRoi.x, optionRoi.y, icon.width(), icon.height() );
+        Blit( icon, 0, 0, ctx, ctx.scale( optionRoi.x ), ctx.scale( optionRoi.y ), ctx.scale( icon.width() ), ctx.scale( icon.height() ) );
     }
 }

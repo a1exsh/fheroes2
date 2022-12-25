@@ -57,28 +57,46 @@ namespace
         Close
     };
 
-    void drawDialog( const std::vector<fheroes2::Rect> & rects )
+    const fheroes2::Size offsetBetweenOptions{ 92, 110 };
+    const fheroes2::Point optionOffset{ 36, 47 };
+    const int32_t optionWindowSize{ 65 };
+
+    const fheroes2::Rect audioSettingsRoi{ optionOffset.x, optionOffset.y, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect hotkeysRoi{ optionOffset.x + offsetBetweenOptions.width, optionOffset.y, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect cursorTypeRoi{ optionOffset.x + offsetBetweenOptions.width * 2, optionOffset.y, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect heroSpeedRoi{ optionOffset.x, optionOffset.y + offsetBetweenOptions.height, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect aiSpeedRoi{ optionOffset.x + offsetBetweenOptions.width, optionOffset.y + offsetBetweenOptions.height, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect scrollSpeedRoi{ optionOffset.x + offsetBetweenOptions.width * 2, optionOffset.y + offsetBetweenOptions.height, optionWindowSize,
+                                         optionWindowSize };
+    const fheroes2::Rect interfaceThemeRoi{ optionOffset.x, optionOffset.y + offsetBetweenOptions.height * 2, optionWindowSize, optionWindowSize };
+    const fheroes2::Rect interfaceStateRoi{ optionOffset.x + offsetBetweenOptions.width, optionOffset.y + offsetBetweenOptions.height * 2, optionWindowSize,
+                                            optionWindowSize };
+    const fheroes2::Rect autoBattleRoi{ optionOffset.x + offsetBetweenOptions.width * 2, optionOffset.y + offsetBetweenOptions.height * 2, optionWindowSize,
+                                        optionWindowSize };
+
+    void drawAudioSettings( fheroes2::DisplayContext & ctx )
     {
-        assert( rects.size() == 9 );
-
-        const Settings & conf = Settings::Get();
-
-        // Audio settings.
         const fheroes2::Sprite & audioSettingsIcon = fheroes2::AGG::GetICN( ICN::SPANEL, 1 );
-        fheroes2::drawOption( rects[0], audioSettingsIcon, _( "Audio" ), _( "Settings" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, audioSettingsRoi, audioSettingsIcon, _( "Audio" ), _( "Settings" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Hot keys.
+    void drawHotkeys( fheroes2::DisplayContext & ctx )
+    {
         const fheroes2::Sprite & hotkeysIcon = fheroes2::AGG::GetICN( ICN::CSPANEL, 5 );
-        fheroes2::drawOption( rects[1], hotkeysIcon, _( "Hot Keys" ), _( "Configure" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, hotkeysRoi, hotkeysIcon, _( "Hot Keys" ), _( "Configure" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Cursor Type.
+    void drawCursorType( fheroes2::DisplayContext & ctx )
+    {
         const bool isMonoCursor = Settings::Get().isMonochromeCursorEnabled();
         const fheroes2::Sprite & cursorTypeIcon = fheroes2::AGG::GetICN( ICN::SPANEL, isMonoCursor ? 20 : 21 );
-        fheroes2::drawOption( rects[2], cursorTypeIcon, _( "Mouse Cursor" ), isMonoCursor ? _( "Black & White" ) : _( "Color" ),
+        fheroes2::drawOption( ctx, cursorTypeRoi, cursorTypeIcon, _( "Mouse Cursor" ), isMonoCursor ? _( "Black & White" ) : _( "Color" ),
                               fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Hero's movement speed.
-        const int heroSpeed = conf.HeroesMoveSpeed();
+    void drawHeroSpeed( fheroes2::DisplayContext & ctx )
+    {
+        const int heroSpeed = Settings::Get().HeroesMoveSpeed();
         uint32_t heroSpeedIconId = 9;
         if ( heroSpeed >= 4 ) {
             heroSpeedIconId = 3 + heroSpeed / 2;
@@ -95,11 +113,12 @@ namespace
         else {
             value = std::to_string( heroSpeed );
         }
+        fheroes2::drawOption( ctx, heroSpeedRoi, heroSpeedIcon, _( "Hero Speed" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        fheroes2::drawOption( rects[3], heroSpeedIcon, _( "Hero Speed" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
-
-        // AI's movement speed.
-        const int aiSpeed = conf.AIMoveSpeed();
+    void drawAiSpeed( fheroes2::DisplayContext & ctx )
+    {
+        const int aiSpeed = Settings::Get().AIMoveSpeed();
         uint32_t aiSpeedIconId = 9;
         if ( aiSpeed >= 4 ) {
             aiSpeedIconId = 3 + aiSpeed / 2;
@@ -109,6 +128,7 @@ namespace
         }
 
         const fheroes2::Sprite & aiSpeedIcon = fheroes2::AGG::GetICN( ICN::SPANEL, aiSpeedIconId );
+        std::string value;
         if ( aiSpeed == 0 ) {
             value = _( "Don't Show" );
         }
@@ -119,10 +139,12 @@ namespace
             value = std::to_string( aiSpeed );
         }
 
-        fheroes2::drawOption( rects[4], aiSpeedIcon, _( "Enemy Speed" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, aiSpeedRoi, aiSpeedIcon, _( "Enemy Speed" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Scrolling speed.
-        const int scrollSpeed = conf.ScrollSpeed();
+    void drawScrollSpeed( fheroes2::DisplayContext & ctx )
+    {
+        const int scrollSpeed = Settings::Get().ScrollSpeed();
         int32_t scrollSpeedIconIcn = ICN::UNKNOWN;
         uint32_t scrollSpeedIconId = 0;
         std::string scrollSpeedName;
@@ -156,11 +178,14 @@ namespace
         assert( scrollSpeedIconIcn != ICN::UNKNOWN );
 
         const fheroes2::Sprite & scrollSpeedIcon = fheroes2::AGG::GetICN( scrollSpeedIconIcn, scrollSpeedIconId );
-        fheroes2::drawOption( rects[5], scrollSpeedIcon, _( "Scroll Speed" ), scrollSpeedName, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, scrollSpeedRoi, scrollSpeedIcon, _( "Scroll Speed" ), scrollSpeedName, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Interface theme.
-        const bool isEvilInterface = conf.isEvilInterfaceEnabled();
+    void drawInterfaceTheme( fheroes2::DisplayContext & ctx )
+    {
+        const bool isEvilInterface = Settings::Get().isEvilInterfaceEnabled();
         const fheroes2::Sprite & interfaceThemeIcon = fheroes2::AGG::GetICN( ICN::SPANEL, isEvilInterface ? 17 : 16 );
+        std::string value;
         if ( isEvilInterface ) {
             value = _( "Evil" );
         }
@@ -168,12 +193,16 @@ namespace
             value = _( "Good" );
         }
 
-        fheroes2::drawOption( rects[6], interfaceThemeIcon, _( "Interface Type" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, interfaceThemeRoi, interfaceThemeIcon, _( "Interface Type" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Interface show/hide state.
+    void drawInterfaceState( fheroes2::DisplayContext & ctx )
+    {
+        const Settings & conf = Settings::Get();
         const bool isHiddenInterface = conf.isHideInterfaceEnabled();
         const fheroes2::Sprite & interfaceStateIcon
-            = isHiddenInterface ? fheroes2::AGG::GetICN( ICN::ESPANEL, 4 ) : fheroes2::AGG::GetICN( ICN::SPANEL, isEvilInterface ? 17 : 16 );
+            = isHiddenInterface ? fheroes2::AGG::GetICN( ICN::ESPANEL, 4 ) : fheroes2::AGG::GetICN( ICN::SPANEL, conf.isEvilInterfaceEnabled() ? 17 : 16 );
+        std::string value;
         if ( isHiddenInterface ) {
             value = _( "Hide" );
         }
@@ -181,19 +210,22 @@ namespace
             value = _( "Show" );
         }
 
-        fheroes2::drawOption( rects[7], interfaceStateIcon, _( "Interface" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx, interfaceStateRoi, interfaceStateIcon, _( "Interface" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+    }
 
-        // Auto-battles.
+    void drawAutoBattle( fheroes2::DisplayContext & ctx )
+    {
+        const Settings & conf = Settings::Get();
         if ( conf.BattleAutoResolve() ) {
             const bool spellcast = conf.BattleAutoSpellcast();
-            value = spellcast ? _( "Auto Resolve" ) : _( "Auto, No Spells" );
+            std::string value = spellcast ? _( "Auto Resolve" ) : _( "Auto, No Spells" );
 
             const fheroes2::Sprite & autoBattleIcon = fheroes2::AGG::GetICN( ICN::CSPANEL, spellcast ? 7 : 6 );
-            fheroes2::drawOption( rects[8], autoBattleIcon, _( "Battles" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+            fheroes2::drawOption( ctx, autoBattleRoi, autoBattleIcon, _( "Battles" ), value, fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
         }
         else {
             const fheroes2::Sprite & autoBattleIcon = fheroes2::AGG::GetICN( ICN::SPANEL, 18 );
-            fheroes2::drawOption( rects[8], autoBattleIcon, _( "Battles" ), _( "autoBattle|Manual" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+            fheroes2::drawOption( ctx, autoBattleRoi, autoBattleIcon, _( "Battles" ), _( "autoBattle|Manual" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
         }
     }
 
@@ -212,93 +244,84 @@ namespace
         const fheroes2::Point dialogOffset( ( display.width() - dialog.width() ) / 2, ( display.height() - dialog.height() ) / 2 );
         const fheroes2::Point shadowOffset( dialogOffset.x - BORDERWIDTH, dialogOffset.y );
 
-        fheroes2::ImageRestorer back( display, shadowOffset.x, shadowOffset.y, dialog.width() + BORDERWIDTH, dialog.height() + BORDERWIDTH );
-        const fheroes2::Rect dialogArea( dialogOffset.x, dialogOffset.y, dialog.width(), dialog.height() );
+        fheroes2::ImageRestorer restorer( display, shadowOffset.x, shadowOffset.y, dialog.width() + BORDERWIDTH, dialog.height() + BORDERWIDTH );
+        const fheroes2::Rect windowRoi( dialogOffset.x, dialogOffset.y, dialog.width(), dialog.height() );
 
-        fheroes2::Fill( display, dialogArea.x, dialogArea.y, dialogArea.width, dialogArea.height, 0 );
-        fheroes2::Blit( dialogShadow, display, dialogArea.x - BORDERWIDTH, dialogArea.y + BORDERWIDTH );
-        fheroes2::Blit( dialog, display, dialogArea.x, dialogArea.y );
+        fheroes2::Fill( display, windowRoi.x, windowRoi.y, windowRoi.width, windowRoi.height, 0 );
+        fheroes2::Blit( dialogShadow, display, windowRoi.x - BORDERWIDTH, windowRoi.y + BORDERWIDTH );
+        fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
 
-        const fheroes2::Sprite & optionSprite = fheroes2::AGG::GetICN( ICN::SPANEL, 0 );
-        const fheroes2::Point optionOffset( 36 + dialogArea.x, 47 + dialogArea.y );
-        const fheroes2::Point optionStep( 92, 110 );
+        fheroes2::DisplayContext ctx = display.getContext( windowRoi.x, windowRoi.y );
 
-        std::vector<fheroes2::Rect> roi;
+        auto drawOptions = []( fheroes2::DisplayContext & c ) {
+            drawAudioSettings( c );
+            drawHotkeys( c );
+            drawCursorType( c );
+            drawHeroSpeed( c );
+            drawAiSpeed( c );
+            drawInterfaceTheme( c );
+            drawInterfaceState( c );
+            drawScrollSpeed( c );
+            drawAutoBattle( c );
+        };
+        drawOptions( ctx );
 
-        for ( int32_t y = 0; y < 3; ++y ) {
-            for ( int32_t x = 0; x < 3; ++x ) {
-                roi.emplace_back( optionOffset.x + x * optionStep.x, optionOffset.y + y * optionStep.y, optionSprite.width(), optionSprite.height() );
-            }
-        }
-
-        const fheroes2::Rect & audioSettingsRoi = roi[0];
-        const fheroes2::Rect & hotkeysRoi = roi[1];
-        const fheroes2::Rect & cursorTypeRoi = roi[2];
-        const fheroes2::Rect & heroSpeedRoi = roi[3];
-        const fheroes2::Rect & aiSpeedRoi = roi[4];
-        const fheroes2::Rect & scrollSpeedRoi = roi[5];
-        const fheroes2::Rect & interfaceTypeRoi = roi[6];
-        const fheroes2::Rect & interfaceStateRoi = roi[7];
-        const fheroes2::Rect & battleResolveRoi = roi[8];
-
-        drawDialog( roi );
-
-        const fheroes2::Point buttonOffset( 112 + dialogArea.x, 362 + dialogArea.y );
+        const fheroes2::Point buttonOffset( 112 + windowRoi.x, 362 + windowRoi.y );
         fheroes2::Button buttonOkay( buttonOffset.x, buttonOffset.y, isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
-        buttonOkay.draw();
+        buttonOkay.draw( ctx );
 
         display.render();
 
         // dialog menu loop
         LocalEvent & le = LocalEvent::Get();
         while ( le.HandleEvents() ) {
-            le.MousePressLeft( buttonOkay.area() ) ? buttonOkay.drawOnPress() : buttonOkay.drawOnRelease();
+            le.MousePressLeft( buttonOkay.area( ctx ) ) ? buttonOkay.drawOnPress( ctx ) : buttonOkay.drawOnRelease( ctx );
 
-            if ( le.MouseClickLeft( buttonOkay.area() ) || Game::HotKeyCloseWindow() ) {
+            if ( le.MouseClickLeft( buttonOkay.area( ctx ) ) || Game::HotKeyCloseWindow() ) {
                 break;
             }
 
             // Open audio settings window.
-            if ( le.MouseClickLeft( audioSettingsRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( audioSettingsRoi ) ) ) {
                 return DialogAction::AudioSettings;
             }
 
             // Open Hotkeys window.
-            if ( le.MouseClickLeft( hotkeysRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( hotkeysRoi ) ) ) {
                 return DialogAction::HotKeys;
             }
 
             // Change Cursor Type.
-            if ( le.MouseClickLeft( cursorTypeRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( cursorTypeRoi ) ) ) {
                 return DialogAction::CursorType;
             }
 
             // set hero speed
             bool saveHeroSpeed = false;
-            if ( le.MouseClickLeft( heroSpeedRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( heroSpeedRoi ) ) ) {
                 conf.SetHeroesMoveSpeed( conf.HeroesMoveSpeed() % 10 + 1 );
                 saveHeroSpeed = true;
             }
-            else if ( le.MouseWheelUp( heroSpeedRoi ) ) {
+            else if ( le.MouseWheelUp( ctx.area( heroSpeedRoi ) ) ) {
                 conf.SetHeroesMoveSpeed( conf.HeroesMoveSpeed() + 1 );
                 saveHeroSpeed = true;
             }
-            else if ( le.MouseWheelDn( heroSpeedRoi ) ) {
+            else if ( le.MouseWheelDn( ctx.area( heroSpeedRoi ) ) ) {
                 conf.SetHeroesMoveSpeed( conf.HeroesMoveSpeed() - 1 );
                 saveHeroSpeed = true;
             }
 
             // set ai speed
             bool saveAISpeed = false;
-            if ( le.MouseClickLeft( aiSpeedRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( aiSpeedRoi ) ) ) {
                 conf.SetAIMoveSpeed( ( conf.AIMoveSpeed() + 1 ) % 11 );
                 saveAISpeed = true;
             }
-            else if ( le.MouseWheelUp( aiSpeedRoi ) ) {
+            else if ( le.MouseWheelUp( ctx.area( aiSpeedRoi ) ) ) {
                 conf.SetAIMoveSpeed( conf.AIMoveSpeed() + 1 );
                 saveAISpeed = true;
             }
-            else if ( le.MouseWheelDn( aiSpeedRoi ) ) {
+            else if ( le.MouseWheelDn( ctx.area( aiSpeedRoi ) ) ) {
                 conf.SetAIMoveSpeed( conf.AIMoveSpeed() - 1 );
                 saveAISpeed = true;
             }
@@ -309,32 +332,32 @@ namespace
 
             // set scroll speed
             bool saveScrollSpeed = false;
-            if ( le.MouseClickLeft( scrollSpeedRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( scrollSpeedRoi ) ) ) {
                 conf.SetScrollSpeed( ( conf.ScrollSpeed() + 1 ) % ( SCROLL_SPEED_VERY_FAST + 1 ) );
                 saveScrollSpeed = true;
             }
-            else if ( le.MouseWheelUp( scrollSpeedRoi ) ) {
+            else if ( le.MouseWheelUp( ctx.area( scrollSpeedRoi ) ) ) {
                 conf.SetScrollSpeed( conf.ScrollSpeed() + 1 );
                 saveScrollSpeed = true;
             }
-            else if ( le.MouseWheelDn( scrollSpeedRoi ) ) {
+            else if ( le.MouseWheelDn( ctx.area( scrollSpeedRoi ) ) ) {
                 conf.SetScrollSpeed( conf.ScrollSpeed() - 1 );
                 saveScrollSpeed = true;
             }
 
             // set interface theme
-            if ( le.MouseClickLeft( interfaceTypeRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( interfaceThemeRoi ) ) ) {
                 return DialogAction::ChangeInterfaceTheme;
             }
 
             // set interface hide/show
-            if ( le.MouseClickLeft( interfaceStateRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( interfaceStateRoi ) ) ) {
                 return DialogAction::UpdateInterface;
             }
 
             // toggle manual/auto battles
             bool saveAutoBattle = false;
-            if ( le.MouseClickLeft( battleResolveRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( autoBattleRoi ) ) ) {
                 if ( conf.BattleAutoResolve() ) {
                     if ( conf.BattleAutoSpellcast() ) {
                         conf.setBattleAutoSpellcast( false );
@@ -350,43 +373,43 @@ namespace
                 saveAutoBattle = true;
             }
 
-            if ( le.MousePressRight( audioSettingsRoi ) ) {
+            if ( le.MousePressRight( ctx.area( audioSettingsRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Audio" ), _( "Change the audio settings of the game." ), 0 );
             }
-            else if ( le.MousePressRight( hotkeysRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( hotkeysRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Hot Keys" ), _( "Check and configure all the hot keys present in the game." ), 0 );
             }
-            else if ( le.MousePressRight( cursorTypeRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( cursorTypeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Mouse Cursor" ), _( "Toggle colored cursor on or off. This is only an esthetic choice." ), 0 );
             }
-            else if ( le.MousePressRight( heroSpeedRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( heroSpeedRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Hero Speed" ), _( "Change the speed at which your heroes move on the main screen." ), 0 );
             }
-            else if ( le.MousePressRight( aiSpeedRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( aiSpeedRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Enemy Speed" ),
                                                    _( "Sets the speed that A.I. heroes move at.  You can also elect not to view A.I. movement at all." ), 0 );
             }
-            else if ( le.MousePressRight( scrollSpeedRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( scrollSpeedRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Scroll Speed" ), _( "Sets the speed at which you scroll the window." ), 0 );
             }
-            else if ( le.MousePressRight( interfaceTypeRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( interfaceThemeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Interface Type" ), _( "Toggle the type of interface you want to use." ), 0 );
             }
-            else if ( le.MousePressRight( interfaceStateRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( interfaceStateRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Interface" ), _( "Toggle interface visibility." ), 0 );
             }
-            else if ( le.MousePressRight( battleResolveRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( autoBattleRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Battles" ), _( "Toggle instant battle mode." ), 0 );
             }
-            else if ( le.MousePressRight( buttonOkay.area() ) ) {
+            else if ( le.MousePressRight( buttonOkay.area( ctx ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Okay" ), _( "Exit this menu." ), 0 );
             }
 
             if ( saveHeroSpeed || saveAISpeed || saveScrollSpeed || saveAutoBattle ) {
                 // redraw
-                fheroes2::Blit( dialog, display, dialogArea.x, dialogArea.y );
-                drawDialog( roi );
-                buttonOkay.draw();
+                fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
+                drawOptions( ctx );
+                buttonOkay.draw( ctx );
                 display.render();
 
                 saveConfiguration = true;

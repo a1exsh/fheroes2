@@ -277,7 +277,7 @@ namespace
         offset->x += lineWidth;
     }
 
-    int32_t render( const uint8_t * data, const int32_t size, const int32_t x, const int32_t y, fheroes2::Image & output, const fheroes2::FontType & fontType )
+    int32_t render( const uint8_t * data, const int32_t size, const int32_t x, const int32_t y, fheroes2::AbstractDrawable & output, const fheroes2::FontType & fontType )
     {
         assert( data != nullptr && size > 0 && !output.empty() );
 
@@ -304,7 +304,7 @@ namespace
         return offsetX;
     }
 
-    void renderLine( const uint8_t * data, const int32_t size, const int32_t x, const int32_t y, const int32_t maxWidth, fheroes2::Image & output,
+    void renderLine( const uint8_t * data, const int32_t size, const int32_t x, const int32_t y, const int32_t maxWidth, fheroes2::AbstractDrawable & output,
                      const fheroes2::FontType & fontType, const bool align )
     {
         if ( align ) {
@@ -316,7 +316,7 @@ namespace
         }
     }
 
-    void render( const uint8_t * data, const int32_t size, const int32_t x, const int32_t y, const int32_t maxWidth, fheroes2::Image & output,
+    void render( const uint8_t * data, const int32_t size, const int32_t x, const int32_t y, const int32_t maxWidth, fheroes2::AbstractDrawable & output,
                  const fheroes2::FontType & fontType, const int32_t rowHeight, const bool align, std::deque<fheroes2::Point> & offsets )
     {
         assert( data != nullptr && size > 0 && !output.empty() && maxWidth > 0 );
@@ -543,7 +543,7 @@ namespace fheroes2
         return offsets.back().y / fontHeight + 1;
     }
 
-    void Text::draw( const int32_t x, const int32_t y, Image & output ) const
+    void Text::draw( const int32_t x, const int32_t y, AbstractDrawable & output ) const
     {
         if ( output.empty() || _text.empty() ) {
             // No use to render something on an empty image or if something is empty.
@@ -553,7 +553,7 @@ namespace fheroes2
         render( reinterpret_cast<const uint8_t *>( _text.data() ), static_cast<int32_t>( _text.size() ), x, y, output, _fontType );
     }
 
-    void Text::draw( const int32_t x, const int32_t y, const int32_t maxWidth, Image & output ) const
+    void Text::draw( const int32_t x, const int32_t y, const int32_t maxWidth, AbstractDrawable & output ) const
     {
         if ( output.empty() || _text.empty() ) {
             // No use to render something on an empty image or if something is empty.
@@ -747,7 +747,7 @@ namespace fheroes2
         return offsets.back().y / maxFontHeight + 1;
     }
 
-    void MultiFontText::draw( const int32_t x, const int32_t y, Image & output ) const
+    void MultiFontText::draw( const int32_t x, const int32_t y, AbstractDrawable & output ) const
     {
         if ( output.empty() || _texts.empty() ) {
             // No use to render something on an empty image or if something is empty.
@@ -764,7 +764,7 @@ namespace fheroes2
         }
     }
 
-    void MultiFontText::draw( const int32_t x, const int32_t y, const int32_t maxWidth, Image & output ) const
+    void MultiFontText::draw( const int32_t x, const int32_t y, const int32_t maxWidth, AbstractDrawable & output ) const
     {
         if ( output.empty() || _texts.empty() ) {
             // No use to render something on an empty image or if something is empty.
