@@ -206,7 +206,7 @@ namespace
         return true;
     }
 
-    bool Verify( const fheroes2::Image & image, int32_t & x, int32_t & y, int32_t & width, int32_t & height )
+    bool Verify( const fheroes2::Drawable & image, int32_t & x, int32_t & y, int32_t & width, int32_t & height )
     {
         if ( image.empty() || width <= 0 || height <= 0 ) // what's the reason to work with empty images?
             return false;
@@ -315,7 +315,7 @@ namespace
         return true;
     }
 
-    bool Verify( const fheroes2::Image & in, int32_t & inX, int32_t & inY, const fheroes2::Image & out, int32_t & outX, int32_t & outY, int32_t & width,
+    bool Verify( const fheroes2::Drawable & in, int32_t & inX, int32_t & inY, const fheroes2::Drawable & out, int32_t & outX, int32_t & outY, int32_t & width,
                  int32_t & height )
     {
         return Verify( inX, inY, outX, outY, width, height, in.width(), in.height(), out.width(), out.height() );
@@ -415,52 +415,32 @@ namespace
 namespace fheroes2
 {
     Image::Image()
-        : _width( 0 )
-        , _height( 0 )
-        , _scaleFactor( 1 )
-        , _singleLayer( false )
     {
-        // Do nothing.
     }
 
     Image::Image( int32_t width_, int32_t height_ )
-        : _width( 0 )
-        , _height( 0 )
-        , _scaleFactor( 1 )
-        , _singleLayer( false )
     {
         Image::resize( width_, height_ );
     }
 
     Image::Image( int32_t width_, int32_t height_, int32_t scaleFactor_ )
-        : _width( 0 )
-        , _height( 0 )
-        , _scaleFactor( 1 )
-        , _singleLayer( false )
     {
         Image::resize( width_, height_, scaleFactor_ );
     }
 
     Image::Image( const Image & image_ )
-        : _width( 0 )
-        , _height( 0 )
-        , _scaleFactor( 1 )
-        , _singleLayer( false )
+        : Drawable()
     {
         copy( image_ );
     }
 
     Image::Image( Image && image_ ) noexcept
-        : _width( 0 )
-        , _height( 0 )
-        , _scaleFactor( 1 )
-        , _data( std::move( image_._data ) )
-        , _singleLayer( false )
+        : _data( std::move( image_._data ) )
     {
-        std::swap( _singleLayer, image_._singleLayer );
         std::swap( _width, image_._width );
         std::swap( _height, image_._height );
         std::swap( _scaleFactor, image_._scaleFactor );
+        std::swap( _singleLayer, image_._singleLayer );
     }
 
     Image & Image::operator=( const Image & image_ )
@@ -495,6 +475,16 @@ namespace fheroes2
     const uint8_t * Image::image() const
     {
         return _data.get();
+    }
+
+    uint8_t * Image::transform()
+    {
+        return image() + width() * height();
+    }
+
+    const uint8_t * Image::transform() const
+    {
+        return image() + width() * height();
     }
 
     void Image::clear()
@@ -987,17 +977,17 @@ namespace fheroes2
         }
     }
 
-    void Blit( const Image & in, Image & out, bool flip )
+    void Blit( const Drawable & in, Drawable & out, bool flip )
     {
         Blit( in, 0, 0, out, 0, 0, in.width(), in.height(), flip );
     }
 
-    void Blit( const Image & in, Image & out, int32_t outX, int32_t outY, bool flip )
+    void Blit( const Drawable & in, Drawable & out, int32_t outX, int32_t outY, bool flip )
     {
         Blit( in, 0, 0, out, outX, outY, in.width(), in.height(), flip );
     }
 
-    void Blit( const Image & in, int32_t inX, int32_t inY, Image & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip )
+    void Blit( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip )
     {
         if ( in.singleLayer() && out.singleLayer() && !flip ) {
             Copy( in, inX, inY, out, outX, outY, width, height );
@@ -1123,7 +1113,7 @@ namespace fheroes2
         }
     }
 
-    void Blit( const Image & in, const Point & inPos, Image & out, const Point & outPos, const Size & size, bool flip )
+    void Blit( const Drawable & in, const Point & inPos, Drawable & out, const Point & outPos, const Size & size, bool flip )
     {
         if ( inPos.x < 0 || inPos.y < 0 )
             return;
@@ -1131,13 +1121,13 @@ namespace fheroes2
         Blit( in, inPos.x, inPos.y, out, outPos.x, outPos.y, size.width, size.height, flip );
     }
 
-    void Copy( const Image & in, Image & out )
+    void Copy( const Drawable & in, Image & out )
     {
         out.resize( in.width(), in.height() );
         Copy( in, 0, 0, out, 0, 0, in.width(), in.height() );
     }
 
-    void Copy( const Image & in, int32_t inX, int32_t inY, Image & out, int32_t outX, int32_t outY, int32_t width, int32_t height )
+    void Copy( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height )
     {
         if ( !Verify( in, inX, inY, out, outX, outY, width, height ) ) {
             return;

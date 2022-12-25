@@ -1495,9 +1495,6 @@ namespace fheroes2
         int32_t scaleFactor = std::max( 1, std::min( width_ / fheroes2::Display::DEFAULT_WIDTH, height_ / fheroes2::Display::DEFAULT_HEIGHT ) );
 
         Image::resize( width_, height_, scaleFactor );
-
-        // To detect some UI artifacts by invalid code let's put all transform data into pixel skipping mode.
-        std::fill( transform(), transform() + width() * height(), static_cast<uint8_t>( 1 ) );
     }
 
     Display & Display::instance()
@@ -1572,6 +1569,11 @@ namespace fheroes2
         if ( updateImage ) {
             _engine->render( *this, roi );
         }
+    }
+
+    DisplayContext Display::getContext( int32_t x, int32_t y )
+    {
+        return { *this, x, y };
     }
 
     uint8_t * Display::image()

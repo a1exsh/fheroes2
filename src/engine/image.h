@@ -28,10 +28,80 @@
 
 namespace fheroes2
 {
+    class Drawable
+    {
+    public:
+        Drawable()
+            : _width( 0 )
+            , _height( 0 )
+            , _scaleFactor( 1 )
+            , _singleLayer( false )
+        {}
+
+        Drawable( Drawable & drawable_ )
+            : _width( drawable_.width() )
+            , _height( drawable_.height() )
+            , _scaleFactor( drawable_.scaleFactor() )
+            , _singleLayer( drawable_.singleLayer() )
+        {}
+
+        Drawable( int32_t width_, int32_t height_ )
+            : _width( width_ )
+            , _height( height_ )
+            , _scaleFactor( 1 )
+            , _singleLayer( false )
+        {}
+
+        Drawable( int32_t width_, int32_t height_, int32_t scaleFactor_ )
+            : _width( width_ )
+            , _height( height_ )
+            , _scaleFactor( scaleFactor_ )
+            , _singleLayer( false )
+        {}
+
+        // It's safe to cast to uint32_t as width and height are always >= 0
+        int32_t width() const
+        {
+            return _width;
+        }
+
+        int32_t height() const
+        {
+            return _height;
+        }
+
+        int32_t scaleFactor() const
+        {
+            return _scaleFactor;
+        }
+
+        bool singleLayer() const
+        {
+            return _singleLayer;
+        }
+
+        virtual bool empty() const
+        {
+            return _width == 0 || _height == 0;
+        }
+
+        virtual uint8_t * image() = 0;
+        virtual const uint8_t * image() const = 0;
+
+        virtual uint8_t * transform() = 0;
+        virtual const uint8_t * transform() const = 0;
+
+    protected:
+        int32_t _width;
+        int32_t _height;
+        int32_t _scaleFactor;
+        bool _singleLayer; // only for images which are not used for any other operations except displaying on screen. Non-copyable member.
+    };
+
     // Image contains image layer and transform layer.
     // - image layer contains visible pixels which are copy to a destination image
     // - transform layer is used to apply some transformation to an image on which we draw the current one. For example, shadowing
-    class Image
+    class Image : public Drawable
     {
     public:
         Image();
@@ -52,51 +122,21 @@ namespace fheroes2
 
         virtual void resize( int32_t width_, int32_t height_, int32_t scaleFactor_ );
 
-        // It's safe to cast to uint32_t as width and height are always >= 0
-        int32_t width() const
-        {
-            return _width;
-        }
-
-        int32_t height() const
-        {
-            return _height;
-        }
-
-        int32_t scaleFactor() const
-        {
-            return _scaleFactor;
-        }
-
-        virtual uint8_t * image();
-        virtual const uint8_t * image() const;
-
-        uint8_t * transform()
-        {
-            return _data.get() + width() * height();
-        }
-
-        const uint8_t * transform() const
-        {
-            return _data.get() + width() * height();
-        }
-
-        bool empty() const
+        bool empty() const override
         {
             return !_data;
         }
+
+        uint8_t * image() override;
+        const uint8_t * image() const override;
+
+        uint8_t * transform() override;
+        const uint8_t * transform() const override;
 
         void reset(); // makes image fully transparent (transform layer is set to 1)
         void clear(); // makes the image empty
 
         void fill( uint8_t value ); // fill 'image' layer with given value, setting 'transform' layer set to 0
-
-        // This is an optional indicator for image processing functions.
-        // The whole image still consists of 2 layers but transform layer might be ignored in computations.
-        bool singleLayer() const
-        {
-            return _singleLayer;
-        }
 
         // BE CAREFUL! This method disables transform layer usage. Use only for display / video related images which are for end rendering purposes!
         // The name of this method starts from _ on purpose to do not mix with other public methods.
@@ -108,12 +148,7 @@ namespace fheroes2
     private:
         void copy( const Image & image );
 
-        int32_t _width;
-        int32_t _height;
-        int32_t _scaleFactor;
         std::unique_ptr<uint8_t[]> _data; // holds 2 image layers
-
-        bool _singleLayer; // only for images which are not used for any other operations except displaying on screen. Non-copyable member.
     };
 
     class Sprite : public Image
@@ -228,15 +263,15 @@ namespace fheroes2
     void ApplyTransform( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId );
 
     // draw one image onto another
-    void Blit( const Image & in, Image & out, bool flip = false );
-    void Blit( const Image & in, Image & out, int32_t outX, int32_t outY, bool flip = false );
-    void Blit( const Image & in, int32_t inX, int32_t inY, Image & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip = false );
+    void Blit( const Drawable & in, Drawable & out, bool flip = false );
+    void Blit( const Drawable & in, Drawable & out, int32_t outX, int32_t outY, bool flip = false );
+    void Blit( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height, bool flip = false );
 
     // inPos must contain non-negative values
-    void Blit( const Image & in, const Point & inPos, Image & out, const Point & outPos, const Size & size, bool flip = false );
+    void Blit( const Drawable & in, const Point & inPos, Drawable & out, const Point & outPos, const Size & size, bool flip = false );
 
-    void Copy( const Image & in, Image & out );
-    void Copy( const Image & in, int32_t inX, int32_t inY, Image & out, int32_t outX, int32_t outY, int32_t width, int32_t height );
+    void Copy( const Drawable & in, Image & out );
+    void Copy( const Drawable & in, int32_t inX, int32_t inY, Drawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height );
 
     // Copies transform the layer from in to out. Both images must be of the same size.
     void CopyTransformLayer( const Image & in, Image & out );

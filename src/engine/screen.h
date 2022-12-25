@@ -32,6 +32,7 @@ namespace fheroes2
 {
     class Cursor;
     class Display;
+    class DisplayContext;
 
     class BaseRenderEngine
     {
@@ -176,6 +177,8 @@ namespace fheroes2
             _postprocessing = postprocessing;
         }
 
+        DisplayContext getContext( int32_t x, int32_t y );
+
         // For 8-bit mode we return a pointer to direct surface which we draw on screen
         uint8_t * image() override;
         const uint8_t * image() const override;
@@ -209,6 +212,52 @@ namespace fheroes2
         Display();
 
         void _renderFrame( const Rect & roi ) const; // prepare and render a frame
+    };
+
+    class DisplayContext : public Drawable
+    {
+    public:
+        DisplayContext( Display & display, int32_t x, int32_t y )
+            : Drawable( display )
+            , _display( display )
+            , _x( std::max( 0, std::min( x, display.width() - 1 ) ) )
+            , _y( std::max( 0, std::min( y, display.height() - 1 ) ) )
+        {}
+
+        uint8_t * image() override
+        {
+            return _display.image() + _x + _y * _display.width();
+        }
+
+        const uint8_t * image() const override
+        {
+            return _display.image() + _x + _y * _display.width();
+        }
+
+        uint8_t * transform() override
+        {
+            return _display.transform() + _x + _y * _display.width();
+        }
+
+        const uint8_t * transform() const override
+        {
+            return _display.transform() + _x + _y * _display.width();
+        }
+
+        // int32_t x() const
+        // {
+        //     return _x;
+        // }
+
+        // int32_t y() const
+        // {
+        //     return _y;
+        // }
+
+    protected:
+        Display & _display;
+        int32_t _x;
+        int32_t _y;
     };
 
     class Cursor
