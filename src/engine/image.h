@@ -165,7 +165,7 @@ namespace fheroes2
     {
     public:
         Sprite();
-        Sprite( int32_t width_, int32_t height_, int32_t x_ = 0, int32_t y_ = 0 );
+        Sprite( int32_t width_, int32_t height_, int32_t x_ = 0, int32_t y_ = 0, int32_t scaleFactor_ = 1 );
         Sprite( const Image & image, int32_t x_ = 0, int32_t y_ = 0 );
         Sprite( const Sprite & sprite );
         Sprite( Sprite && sprite ) noexcept;
@@ -273,6 +273,7 @@ namespace fheroes2
     void ApplyTransform( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId );
 
     // draw one image onto another
+    void Blit( const Sprite & in, AbstractDrawable & out, bool flip = false );
     void Blit( const AbstractDrawable & in, AbstractDrawable & out, bool flip = false );
     void Blit( const AbstractDrawable & in, AbstractDrawable & out, int32_t outX, int32_t outY, bool flip = false );
     void Blit( const AbstractDrawable & in, int32_t inX, int32_t inY, AbstractDrawable & out, int32_t outX, int32_t outY, int32_t width, int32_t height,

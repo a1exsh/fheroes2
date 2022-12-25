@@ -287,10 +287,7 @@ namespace fheroes2
             _display.render( roi );
         }
 
-        Rect area( const Rect & r ) const
-        {
-            return { r.x + _x, r.y + _y, r.width, r.height };
-        }
+        Rect area( const Rect & r ) const;
 
         // int32_t x() const
         // {

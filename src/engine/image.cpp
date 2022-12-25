@@ -568,8 +568,8 @@ namespace fheroes2
         // Do nothing.
     }
 
-    Sprite::Sprite( int32_t width_, int32_t height_, int32_t x_, int32_t y_ )
-        : Image( width_, height_ )
+    Sprite::Sprite( int32_t width_, int32_t height_, int32_t x_, int32_t y_, int32_t scaleFactor_ )
+        : Image( width_, height_, scaleFactor_ )
         , _x( x_ )
         , _y( y_ )
     {
@@ -975,6 +975,11 @@ namespace fheroes2
                 }
             }
         }
+    }
+
+    void Blit( const Sprite & in, AbstractDrawable & out, bool flip )
+    {
+        Blit( in, 0, 0, out, in.x(), in.y(), in.width(), in.height(), flip );
     }
 
     void Blit( const AbstractDrawable & in, AbstractDrawable & out, bool flip )

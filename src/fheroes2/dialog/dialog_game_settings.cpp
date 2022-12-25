@@ -59,32 +59,36 @@ namespace
     const fheroes2::Rect textSupportModeRoi{ optionOffset.x + offsetBetweenOptions.width * 2, optionOffset.y + offsetBetweenOptions.height, optionWindowSize,
                                              optionWindowSize };
 
-    void drawLanguage( const fheroes2::Rect & optionRoi )
+    void drawLanguage( fheroes2::DisplayContext & ctx )
     {
         const fheroes2::SupportedLanguage currentLanguage = fheroes2::getLanguageFromAbbreviation( Settings::Get().getGameLanguage() );
         fheroes2::LanguageSwitcher languageSwitcher( currentLanguage );
 
-        fheroes2::drawOption( optionRoi, fheroes2::AGG::GetICN( ICN::SPANEL, 18 ), _( "Language" ), fheroes2::getLanguageName( currentLanguage ),
+        fheroes2::drawOption( ctx.area( languageRoi ), fheroes2::AGG::GetICN( ICN::SPANEL, 18 ), _( "Language" ), fheroes2::getLanguageName( currentLanguage ),
                               fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
     }
 
-    void drawGraphics( const fheroes2::Rect & optionRoi )
+    void drawGraphics( fheroes2::DisplayContext & ctx )
     {
-        fheroes2::drawOption( optionRoi, fheroes2::AGG::GetICN( ICN::SPANEL, 15 ), _( "Graphics" ), _( "Settings" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx.area( graphicsRoi ), fheroes2::AGG::GetICN( ICN::SPANEL, 15 ), _( "Graphics" ), _( "Settings" ),
+                              fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
     }
 
-    void drawAudioOptions( const fheroes2::Rect & optionRoi )
+    void drawAudioOptions( fheroes2::DisplayContext & ctx )
     {
-        fheroes2::drawOption( optionRoi, fheroes2::AGG::GetICN( ICN::SPANEL, 1 ), _( "Audio" ), _( "Settings" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx.area( audioRoi ), fheroes2::AGG::GetICN( ICN::SPANEL, 1 ), _( "Audio" ), _( "Settings" ),
+                              fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
     }
 
-    void drawHotKeyOptions( const fheroes2::Rect & optionRoi )
+    void drawHotKeyOptions( fheroes2::DisplayContext & ctx )
     {
-        fheroes2::drawOption( optionRoi, fheroes2::AGG::GetICN( ICN::CSPANEL, 5 ), _( "Hot Keys" ), _( "Configure" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
+        fheroes2::drawOption( ctx.area( hotKeyRoi ), fheroes2::AGG::GetICN( ICN::CSPANEL, 5 ), _( "Hot Keys" ), _( "Configure" ),
+                              fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
     }
 
-    void drawCursorTypeOptions( const fheroes2::Rect & optionRoi )
+    void drawCursorTypeOptions( fheroes2::DisplayContext & ctx )
     {
+        const fheroes2::Rect optionRoi = ctx.area( cursorTypeRoi );
         if ( Settings::Get().isMonochromeCursorEnabled() ) {
             fheroes2::drawOption( optionRoi, fheroes2::AGG::GetICN( ICN::SPANEL, 20 ), _( "Mouse Cursor" ), _( "Black & White" ),
                                   fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
@@ -95,8 +99,9 @@ namespace
         }
     }
 
-    void drawTextSupportModeOptions( const fheroes2::Rect & optionRoi )
+    void drawTextSupportModeOptions( fheroes2::DisplayContext & ctx )
     {
+        const fheroes2::Rect optionRoi = ctx.area( textSupportModeRoi );
         if ( Settings::Get().isTextSupportModeEnabled() ) {
             fheroes2::drawOption( optionRoi, fheroes2::AGG::GetICN( ICN::CSPANEL, 4 ), _( "Text Support" ), _( "On" ), fheroes2::UiOptionTextWidth::THREE_ELEMENTS_ROW );
         }
@@ -142,26 +147,20 @@ namespace
 
         const int buttonIcnId = isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD;
 
-        const fheroes2::Rect windowLanguageRoi( languageRoi + windowRoi.getPosition() );
-        const fheroes2::Rect windowGraphicsRoi( graphicsRoi + windowRoi.getPosition() );
-        const fheroes2::Rect windowAudioRoi( audioRoi + windowRoi.getPosition() );
-        const fheroes2::Rect windowHotKeyRoi( hotKeyRoi + windowRoi.getPosition() );
-        const fheroes2::Rect windowCursorTypeRoi( cursorTypeRoi + windowRoi.getPosition() );
-        const fheroes2::Rect windowTextSupportModeRoi( textSupportModeRoi + windowRoi.getPosition() );
+        fheroes2::DisplayContext ctx = display.getContext( windowRoi.x, windowRoi.y );
 
-        auto drawOptions = [&windowLanguageRoi, &windowGraphicsRoi, &windowAudioRoi, &windowHotKeyRoi, &windowCursorTypeRoi, &windowTextSupportModeRoi]() {
-            drawLanguage( windowLanguageRoi );
-            drawGraphics( windowGraphicsRoi );
-            drawAudioOptions( windowAudioRoi );
-            drawHotKeyOptions( windowHotKeyRoi );
-            drawCursorTypeOptions( windowCursorTypeRoi );
-            drawTextSupportModeOptions( windowTextSupportModeRoi );
+        auto drawOptions = []( fheroes2::DisplayContext & c ) {
+            drawLanguage( c );
+            drawGraphics( c );
+            drawAudioOptions( c );
+            drawHotKeyOptions( c );
+            drawCursorTypeOptions( c );
+            drawTextSupportModeOptions( c );
         };
+        drawOptions( ctx );
 
-        drawOptions();
-
-        fheroes2::ButtonSprite okayButton( windowRoi.x + 112, windowRoi.y + 252, fheroes2::AGG::GetICN( buttonIcnId, 0 ), fheroes2::AGG::GetICN( buttonIcnId, 1 ) );
-        okayButton.draw();
+        fheroes2::ButtonSprite okayButton( 112, 252, fheroes2::AGG::GetICN( buttonIcnId, 0 ), fheroes2::AGG::GetICN( buttonIcnId, 1 ) );
+        okayButton.draw( ctx );
 
         display.render();
 
@@ -169,55 +168,55 @@ namespace
 
         LocalEvent & le = LocalEvent::Get();
         while ( le.HandleEvents() ) {
-            if ( le.MousePressLeft( okayButton.area() ) ) {
-                okayButton.drawOnPress();
+            if ( le.MousePressLeft( okayButton.area( ctx ) ) ) {
+                okayButton.drawOnPress( ctx );
             }
             else {
-                okayButton.drawOnRelease();
+                okayButton.drawOnRelease( ctx );
             }
 
-            if ( le.MouseClickLeft( okayButton.area() ) || Game::HotKeyCloseWindow() ) {
+            if ( le.MouseClickLeft( okayButton.area( ctx ) ) || Game::HotKeyCloseWindow() ) {
                 break;
             }
-            if ( le.MouseClickLeft( windowLanguageRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( languageRoi ) ) ) {
                 return SelectedWindow::Language;
             }
-            if ( le.MouseClickLeft( windowGraphicsRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( graphicsRoi ) ) ) {
                 return SelectedWindow::Graphics;
             }
-            if ( le.MouseClickLeft( windowAudioRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( audioRoi ) ) ) {
                 return SelectedWindow::AudioSettings;
             }
-            if ( le.MouseClickLeft( windowHotKeyRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( hotKeyRoi ) ) ) {
                 return SelectedWindow::HotKeys;
             }
-            if ( le.MouseClickLeft( windowCursorTypeRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( cursorTypeRoi ) ) ) {
                 return SelectedWindow::CursorType;
             }
-            if ( le.MouseClickLeft( windowTextSupportModeRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( textSupportModeRoi ) ) ) {
                 return SelectedWindow::TextSupportMode;
             }
 
-            if ( le.MousePressRight( windowLanguageRoi ) ) {
+            if ( le.MousePressRight( ctx.area( languageRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Select Game Language" ), _( "Change the language of the game." ), 0 );
             }
-            else if ( le.MousePressRight( windowGraphicsRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( graphicsRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Graphics" ), _( "Change the graphics settings of the game." ), 0 );
             }
-            else if ( le.MousePressRight( windowAudioRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( audioRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Audio" ), _( "Change the audio settings of the game." ), 0 );
             }
-            else if ( le.MousePressRight( windowHotKeyRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( hotKeyRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Hot Keys" ), _( "Check and configure all the hot keys present in the game." ), 0 );
             }
-            else if ( le.MousePressRight( windowCursorTypeRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( cursorTypeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Mouse Cursor" ), _( "Toggle colored cursor on or off. This is only an esthetic choice." ), 0 );
             }
-            else if ( le.MousePressRight( windowTextSupportModeRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( textSupportModeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Text Support" ), _( "Toggle text support mode to output extra information about windows and events in the game." ),
                                                    0 );
             }
-            else if ( le.MousePressRight( okayButton.area() ) ) {
+            else if ( le.MousePressRight( okayButton.area( ctx ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Okay" ), _( "Exit this menu." ), 0 );
             }
 
@@ -226,7 +225,7 @@ namespace
                 isTextSupportModeEnabled = conf.isTextSupportModeEnabled();
 
                 emptyDialogRestorer.restore();
-                drawOptions();
+                drawOptions( ctx );
 
                 display.render( emptyDialogRestorer.rect() );
             }
