@@ -29,27 +29,17 @@
 
 namespace fheroes2
 {
-    void drawSprite( fheroes2::DisplayContext & ctx, const int icnId, const uint32_t index )
-    {
-        const Sprite & sprite = AGG::GetICN( icnId, index );
-        Blit( sprite, 0, 0, ctx, sprite.x(), sprite.y(), sprite.width(), sprite.height() );
-    }
-
     void drawMainMenuScreen()
     {
         Display & display = Display::instance();
-
         const Image & background = AGG::GetICN( ICN::HEROES, 0 );
-        const int32_t offX = ( display.width() - background.width() ) / 2;
-        const int32_t offY = ( display.height() - background.height() ) / 2;
+        DisplayContext ctx = display.getContext( ( display.width() - background.width() ) / 2, ( display.height() - background.height() ) / 2 );
 
-        DisplayContext ctx = display.getContext( offX, offY );
-        Blit( background, ctx, 0, 0 );
-
-        drawSprite( ctx, ICN::BTNSHNGL, 1 );
-        drawSprite( ctx, ICN::BTNSHNGL, 5 );
-        drawSprite( ctx, ICN::BTNSHNGL, 9 );
-        drawSprite( ctx, ICN::BTNSHNGL, 13 );
-        drawSprite( ctx, ICN::BTNSHNGL, 17 );
+        Blit( background, ctx );
+        Blit( AGG::GetICN( ICN::BTNSHNGL, 1 ), ctx );
+        Blit( AGG::GetICN( ICN::BTNSHNGL, 5 ), ctx );
+        Blit( AGG::GetICN( ICN::BTNSHNGL, 9 ), ctx );
+        Blit( AGG::GetICN( ICN::BTNSHNGL, 13 ), ctx );
+        Blit( AGG::GetICN( ICN::BTNSHNGL, 17 ), ctx );
     }
 }
