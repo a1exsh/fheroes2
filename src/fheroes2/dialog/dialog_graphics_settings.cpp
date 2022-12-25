@@ -97,7 +97,7 @@ namespace
     {
         const bool isSystemInfoDisplayed = Settings::Get().isSystemInfoEnabled();
 
-        fheroes2::Sprite image = fheroes2::Crop( fheroes2::AGG::GetICN( ICN::ESPANBKG, 0 ), 69, 47, 65, 65 );
+        fheroes2::Sprite image = fheroes2::Crop( fheroes2::AGG::GetICN( ICN::ESPANBKG, 0 ), ctx.scale( 69 ), ctx.scale( 47 ), ctx.scale( 65 ), ctx.scale( 65 ) );
         fheroes2::Text info;
         if ( isSystemInfoDisplayed ) {
             info.set( _( "FPS" ), fheroes2::FontType( fheroes2::FontSize::NORMAL, fheroes2::FontColor::YELLOW ) );
@@ -147,8 +147,7 @@ namespace
         };
         drawOptions( ctx );
 
-        const fheroes2::Point buttonOffset( 112 + windowRoi.x, 252 + windowRoi.y );
-        fheroes2::Button okayButton( buttonOffset.x, buttonOffset.y, isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
+        fheroes2::Button okayButton( ctx.scale( 112 ), ctx.scale( 252 ), isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
         okayButton.draw( ctx );
 
         display.render();

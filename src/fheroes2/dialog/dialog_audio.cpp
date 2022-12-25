@@ -159,9 +159,8 @@ namespace Dialog
         };
         drawOptions( ctx );
 
-        const fheroes2::Point buttonOffset( 112 + windowRoi.x, 252 + windowRoi.y );
-        fheroes2::Button buttonOkay( buttonOffset.x, buttonOffset.y, isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
-        buttonOkay.draw();
+        fheroes2::Button buttonOkay( ctx.scale( 112 ), ctx.scale( 252 ), isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
+        buttonOkay.draw( ctx );
 
         display.render();
 
@@ -170,9 +169,9 @@ namespace Dialog
         // dialog menu loop
         LocalEvent & le = LocalEvent::Get();
         while ( le.HandleEvents() ) {
-            le.MousePressLeft( buttonOkay.area() ) ? buttonOkay.drawOnPress() : buttonOkay.drawOnRelease();
+            le.MousePressLeft( buttonOkay.area( ctx ) ) ? buttonOkay.drawOnPress( ctx ) : buttonOkay.drawOnRelease( ctx );
 
-            if ( le.MouseClickLeft( buttonOkay.area() ) || Game::HotKeyCloseWindow() ) {
+            if ( le.MouseClickLeft( buttonOkay.area( ctx ) ) || Game::HotKeyCloseWindow() ) {
                 break;
             }
 
@@ -180,15 +179,15 @@ namespace Dialog
             bool saveMusicVolume = false;
             bool saveSoundVolume = false;
             if ( Audio::isValid() ) {
-                if ( le.MouseClickLeft( musicVolumeRoi ) ) {
+                if ( le.MouseClickLeft( ctx.area( musicVolumeRoi ) ) ) {
                     conf.SetMusicVolume( ( conf.MusicVolume() + 1 ) % 11 );
                     saveMusicVolume = true;
                 }
-                else if ( le.MouseWheelUp( musicVolumeRoi ) ) {
+                else if ( le.MouseWheelUp( ctx.area( musicVolumeRoi ) ) ) {
                     conf.SetMusicVolume( conf.MusicVolume() + 1 );
                     saveMusicVolume = true;
                 }
-                else if ( le.MouseWheelDn( musicVolumeRoi ) ) {
+                else if ( le.MouseWheelDn( ctx.area( musicVolumeRoi ) ) ) {
                     conf.SetMusicVolume( conf.MusicVolume() - 1 );
                     saveMusicVolume = true;
                 }
@@ -197,19 +196,19 @@ namespace Dialog
                     Music::setVolume( 100 * conf.MusicVolume() / 10 );
                 }
 
-                if ( le.MouseClickLeft( soundVolumeRoi ) ) {
+                if ( le.MouseClickLeft( ctx.area( soundVolumeRoi ) ) ) {
                     conf.SetSoundVolume( ( conf.SoundVolume() + 1 ) % 11 );
                     saveSoundVolume = true;
                 }
-                else if ( le.MouseWheelUp( soundVolumeRoi ) ) {
+                else if ( le.MouseWheelUp( ctx.area( soundVolumeRoi ) ) ) {
                     conf.SetSoundVolume( conf.SoundVolume() + 1 );
                     saveSoundVolume = true;
                 }
-                else if ( le.MouseWheelDn( soundVolumeRoi ) ) {
+                else if ( le.MouseWheelDn( ctx.area( soundVolumeRoi ) ) ) {
                     conf.SetSoundVolume( conf.SoundVolume() - 1 );
                     saveSoundVolume = true;
                 }
-                if ( le.MouseClickLeft( audio3DRoi ) ) {
+                if ( le.MouseClickLeft( ctx.area( audio3DRoi ) ) ) {
                     conf.set3DAudio( !conf.is3DAudioEnabled() );
                     saveSoundVolume = true;
                 }
@@ -221,7 +220,7 @@ namespace Dialog
 
             // set music type
             bool saveMusicType = false;
-            if ( le.MouseClickLeft( musicTypeRoi ) ) {
+            if ( le.MouseClickLeft( ctx.area( musicTypeRoi ) ) ) {
                 int type = conf.MusicType() + 1;
                 // If there's no expansion files we skip this option
                 if ( type == MUSIC_MIDI_EXPANSION && !conf.isPriceOfLoyaltySupported() ) {
@@ -235,20 +234,20 @@ namespace Dialog
                 saveMusicType = true;
             }
 
-            if ( le.MousePressRight( musicVolumeRoi ) ) {
+            if ( le.MousePressRight( ctx.area( musicVolumeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Music" ), _( "Toggle ambient music level." ), 0 );
             }
 
-            else if ( le.MousePressRight( soundVolumeRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( soundVolumeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Effects" ), _( "Toggle foreground sounds level." ), 0 );
             }
-            else if ( le.MousePressRight( musicTypeRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( musicTypeRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Music Type" ), _( "Change the type of music." ), 0 );
             }
-            else if ( le.MousePressRight( audio3DRoi ) ) {
+            else if ( le.MousePressRight( ctx.area( audio3DRoi ) ) ) {
                 fheroes2::showStandardTextMessage( _( "3D Audio" ), _( "Toggle 3D effects of foreground sounds." ), 0 );
             }
-            else if ( le.MousePressRight( buttonOkay.area() ) ) {
+            else if ( le.MousePressRight( buttonOkay.area( ctx ) ) ) {
                 fheroes2::showStandardTextMessage( _( "Okay" ), _( "Exit this menu." ), 0 );
             }
 
@@ -256,7 +255,7 @@ namespace Dialog
                 // redraw
                 fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
                 drawOptions( ctx );
-                buttonOkay.draw();
+                buttonOkay.draw( ctx );
                 display.render();
 
                 saveConfig = true;

@@ -266,8 +266,7 @@ namespace
         };
         drawOptions( ctx );
 
-        const fheroes2::Point buttonOffset( 112 + windowRoi.x, 362 + windowRoi.y );
-        fheroes2::Button buttonOkay( buttonOffset.x, buttonOffset.y, isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
+        fheroes2::Button buttonOkay( ctx.scale( 112 ), ctx.scale( 252 ), isEvilInterface ? ICN::BUTTON_SMALL_OKAY_EVIL : ICN::BUTTON_SMALL_OKAY_GOOD, 0, 1 );
         buttonOkay.draw( ctx );
 
         display.render();
