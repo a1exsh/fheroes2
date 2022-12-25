@@ -36,5 +36,6 @@ namespace fheroes2
 
     class Sprite;
 
-    void drawOption( DisplayContext & ctx, const Rect & optionRoi, const Sprite & icon, std::string titleText, std::string valueText, const int32_t textMaxWidth );
+    void drawOption( DisplayContext & ctx, const Rect & optionRoi, const Sprite & icon, const std::string & titleText, const std::string & valueText,
+                     const int32_t textMaxWidth );
 }

@@ -29,24 +29,25 @@
 
 namespace
 {
-    const int32_t textVerticalOffset = 12;
-    const int32_t nameVerticalOffset = 6;
+    const int32_t titleVerticalOffset = 12;
+    const int32_t valueVerticalOffset = 6;
 }
 
 namespace fheroes2
 {
-    void drawOption( DisplayContext & ctx, const Rect & optionRoi, const Sprite & icon, std::string titleText, std::string valueText, const int32_t textMaxWidth )
+    void drawOption( DisplayContext & ctx, const Rect & optionRoi, const Sprite & icon, const std::string & titleText, const std::string & valueText,
+                     const int32_t textMaxWidth )
     {
-        const Text title( std::move( titleText ), FontType::smallWhite() );
-        const Text name( std::move( valueText ), FontType::smallWhite() );
+        const Text title( titleText, FontType::smallWhite() );
+        const Text value( valueText, FontType::smallWhite() );
 
         // Calculate the text field left border position to horizontally align the text to the icon center.
-        const int32_t textHorizontalOffset = optionRoi.x + ( icon.width() - textMaxWidth ) / 2;
+        const int32_t titleHorizontalOffset = ctx.scale( optionRoi.x ) + ( icon.width() - ctx.scale( textMaxWidth ) ) / 2;
 
-        title.draw( ctx.scale( textHorizontalOffset ), ctx.scale( optionRoi.y - textVerticalOffset + title.height() - title.height( textMaxWidth ) ),
+        title.draw( titleHorizontalOffset, ctx.scale( optionRoi.y - titleVerticalOffset ) + title.height() - title.height( ctx.scale( textMaxWidth ) ),
                     ctx.scale( textMaxWidth ), ctx );
-        name.draw( ctx.scale( textHorizontalOffset ), ctx.scale( optionRoi.y + optionRoi.height + nameVerticalOffset ), ctx.scale( textMaxWidth ), ctx );
+        value.draw( titleHorizontalOffset, ctx.scale( optionRoi.y + optionRoi.height + valueVerticalOffset ), ctx.scale( textMaxWidth ), ctx );
 
-        Blit( icon, 0, 0, ctx, ctx.scale( optionRoi.x ), ctx.scale( optionRoi.y ), ctx.scale( icon.width() ), ctx.scale( icon.height() ) );
+        Blit( icon, 0, 0, ctx, ctx.scale( optionRoi.x ), ctx.scale( optionRoi.y ), icon.width(), icon.height() );
     }
 }
