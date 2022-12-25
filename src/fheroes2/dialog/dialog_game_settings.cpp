@@ -159,7 +159,7 @@ namespace
         };
         drawOptions( ctx );
 
-        fheroes2::ButtonSprite okayButton( 112, 252, fheroes2::AGG::GetICN( buttonIcnId, 0 ), fheroes2::AGG::GetICN( buttonIcnId, 1 ) );
+        fheroes2::ButtonSprite okayButton( ctx.scale( 112 ), ctx.scale( 252 ), fheroes2::AGG::GetICN( buttonIcnId, 0 ), fheroes2::AGG::GetICN( buttonIcnId, 1 ) );
         okayButton.draw( ctx );
 
         display.render();

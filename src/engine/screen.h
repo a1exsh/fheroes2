@@ -287,9 +287,46 @@ namespace fheroes2
             _display.render( roi );
         }
 
-        Rect area( const Rect & r ) const;
-        Rect scale( const Rect & r ) const;
-        Rect translate( const Rect & r ) const;
+        // Scaling and translation of coordinates.
+        int32_t coordX( int32_t x ) const
+        {
+            return translateX( scale( x ) );
+        }
+
+        int32_t coordY( int32_t y ) const
+        {
+            return translateY( scale( y ) );
+        }
+
+        int32_t scale( int32_t xy ) const
+        {
+            return xy * _display.scaleFactor();
+        }
+
+        int32_t translateX( int32_t x ) const
+        {
+            return _x + x;
+        }
+
+        int32_t translateY( int32_t y ) const
+        {
+            return _y + y;
+        }
+
+        Rect area( const Rect & r ) const
+        {
+            return translate( scale( r ) );
+        }
+
+        Rect scale( const Rect & r ) const
+        {
+            return { scale( r.x ), scale( r.y ), scale( r.width ), scale( r.height ) };
+        }
+
+        Rect translate( const Rect & r ) const
+        {
+            return { translateX( r.x ), translateY( r.y ), r.width, r.height };
+        }
 
     private:
         Display & _display;
