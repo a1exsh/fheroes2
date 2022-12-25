@@ -150,6 +150,11 @@ namespace fheroes2
         return Rect( _offsetX + sprite.x(), _offsetY + sprite.y(), sprite.width(), sprite.height() );
     }
 
+    Rect ButtonBase::area( const DisplayContext & ctx ) const
+    {
+        return ctx.area( area() );
+    }
+
     const Sprite & ButtonBase::_getDisabled() const
     {
         const Sprite & sprite = _getReleased();

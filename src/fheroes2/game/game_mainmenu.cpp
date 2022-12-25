@@ -256,7 +256,7 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
 
     display.render();
 
-    const fheroes2::Rect settingsArea( offX + 63 * display.scaleFactor(), offY + 202 * display.scaleFactor(), 90 * display.scaleFactor(), 160 * display.scaleFactor() );
+    const fheroes2::Rect settingsArea( 63 * ctx.scaleFactor(), 202 * ctx.scaleFactor(), 90 * ctx.scaleFactor(), 160 * ctx.scaleFactor() );
 
     uint32_t lantern_frame = 0;
 
@@ -268,7 +268,7 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
 
     for ( size_t i = 0; le.MouseMotion() && i < buttons.size(); ++i ) {
         const fheroes2::Sprite & sprite = fheroes2::AGG::GetICN( ICN::BTNSHNGL, buttons[i].frame );
-        fheroes2::Blit( sprite, display, offX + sprite.x(), offY + sprite.y() );
+        fheroes2::Blit( sprite, ctx, sprite.x(), sprite.y() );
     }
 
     fheroes2::Sprite highlightDoor = fheroes2::AGG::GetICN( ICN::SHNGANIM, 18 );
@@ -290,14 +290,14 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
         for ( size_t i = 0; i < buttons.size(); ++i ) {
             buttons[i].wasOver = buttons[i].isOver;
 
-            if ( le.MousePressLeft( buttons[i].button.area() ) ) {
+            if ( le.MousePressLeft( buttons[i].button.area( ctx ) ) ) {
                 buttons[i].button.drawOnPress( ctx );
             }
             else {
                 buttons[i].button.drawOnRelease( ctx );
             }
 
-            buttons[i].isOver = le.MouseCursor( buttons[i].button.area() );
+            buttons[i].isOver = le.MouseCursor( buttons[i].button.area( ctx ) );
 
             if ( buttons[i].isOver != buttons[i].wasOver ) {
                 uint32_t frame = buttons[i].frame;
@@ -309,7 +309,7 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
                     redrawScreen = true;
                 }
                 const fheroes2::Sprite & sprite = fheroes2::AGG::GetICN( ICN::BTNSHNGL, frame );
-                fheroes2::Blit( sprite, display, offX + sprite.x(), offY + sprite.y() );
+                fheroes2::Blit( sprite, ctx, sprite.x(), sprite.y() );
             }
         }
 
@@ -317,55 +317,54 @@ fheroes2::GameMode Game::MainMenu( bool isFirstGameRun )
             display.render();
         }
 
-        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_NEW_GAME ) || le.MouseClickLeft( buttonNewGame.area() ) ) {
+        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_NEW_GAME ) || le.MouseClickLeft( buttonNewGame.area( ctx ) ) ) {
             return fheroes2::GameMode::NEW_GAME;
         }
 
-        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_LOAD_GAME ) || le.MouseClickLeft( buttonLoadGame.area() ) ) {
+        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_LOAD_GAME ) || le.MouseClickLeft( buttonLoadGame.area( ctx ) ) ) {
             return fheroes2::GameMode::LOAD_GAME;
         }
 
-        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_HIGHSCORES ) || le.MouseClickLeft( buttonHighScores.area() ) ) {
+        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_HIGHSCORES ) || le.MouseClickLeft( buttonHighScores.area( ctx ) ) ) {
             return fheroes2::GameMode::HIGHSCORES_STANDARD;
         }
 
-        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_CREDITS ) || le.MouseClickLeft( buttonCredits.area() ) ) {
+        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_CREDITS ) || le.MouseClickLeft( buttonCredits.area( ctx ) ) ) {
             return fheroes2::GameMode::CREDITS;
         }
 
-        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_QUIT ) || HotKeyPressEvent( HotKeyEvent::DEFAULT_CANCEL ) || le.MouseClickLeft( buttonQuit.area() ) ) {
+        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_QUIT ) || HotKeyPressEvent( HotKeyEvent::DEFAULT_CANCEL ) || le.MouseClickLeft( buttonQuit.area( ctx ) ) ) {
             if ( Interface::Basic::EventExit() == fheroes2::GameMode::QUIT_GAME ) {
                 return fheroes2::GameMode::QUIT_GAME;
             }
         }
-        else if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_SETTINGS ) || le.MouseClickLeft( settingsArea ) ) {
+        else if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_SETTINGS ) || le.MouseClickLeft( ctx.area( settingsArea ) ) ) {
             fheroes2::openGameSettings();
 
             return fheroes2::GameMode::MAIN_MENU;
         }
 
         // right info
-        if ( le.MousePressRight( buttonQuit.area() ) )
+        if ( le.MousePressRight( buttonQuit.area( ctx ) ) )
             Dialog::Message( _( "Quit" ), _( "Quit Heroes of Might and Magic II and return to the operating system." ), Font::BIG );
-        else if ( le.MousePressRight( buttonLoadGame.area() ) )
+        else if ( le.MousePressRight( buttonLoadGame.area( ctx ) ) )
             Dialog::Message( _( "Load Game" ), _( "Load a previously saved game." ), Font::BIG );
-        else if ( le.MousePressRight( buttonCredits.area() ) )
+        else if ( le.MousePressRight( buttonCredits.area( ctx ) ) )
             Dialog::Message( _( "Credits" ), _( "View the credits screen." ), Font::BIG );
-        else if ( le.MousePressRight( buttonHighScores.area() ) )
+        else if ( le.MousePressRight( buttonHighScores.area( ctx ) ) )
             Dialog::Message( _( "High Scores" ), _( "View the high scores screen." ), Font::BIG );
-        else if ( le.MousePressRight( buttonNewGame.area() ) )
+        else if ( le.MousePressRight( buttonNewGame.area( ctx ) ) )
             Dialog::Message( _( "New Game" ), _( "Start a single or multi-player game." ), Font::BIG );
-        else if ( le.MousePressRight( settingsArea ) )
+        else if ( le.MousePressRight( ctx.area( settingsArea ) ) )
             Dialog::Message( _( "Game Settings" ), _( "Change language, resolution and settings of the game." ), Font::BIG );
 
         if ( validateAnimationDelay( MAIN_MENU_DELAY ) ) {
             const fheroes2::Sprite & lantern12 = fheroes2::AGG::GetICN( ICN::SHNGANIM, ICN::AnimationFrame( ICN::SHNGANIM, 0, lantern_frame ) );
             ++lantern_frame;
-            fheroes2::Blit( lantern12, display, offX + lantern12.x(), offY + lantern12.y() );
-            if ( le.MouseCursor( settingsArea ) ) {
+            fheroes2::Blit( lantern12, ctx, lantern12.x(), lantern12.y() );
+            if ( le.MouseCursor( ctx.area( settingsArea ) ) ) {
                 const int32_t offsetY = static_cast<int32_t>( 55 * display.scaleFactor() );
-                fheroes2::Blit( highlightDoor, 0, offsetY, display, offX + highlightDoor.x(), offY + highlightDoor.y() + offsetY, highlightDoor.width(),
-                                highlightDoor.height() );
+                fheroes2::Blit( highlightDoor, 0, offsetY, ctx, highlightDoor.x(), highlightDoor.y() + offsetY, highlightDoor.width(), highlightDoor.height() );
             }
 
             display.render();

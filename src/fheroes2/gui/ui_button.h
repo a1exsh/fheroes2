@@ -98,6 +98,7 @@ namespace fheroes2
         bool drawOnRelease( AbstractDisplay & output = Display::instance() );
 
         Rect area() const;
+        Rect area( const DisplayContext & ctx ) const;
 
     protected:
         virtual const Sprite & _getPressed() const = 0;
