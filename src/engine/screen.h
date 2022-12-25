@@ -288,18 +288,10 @@ namespace fheroes2
         }
 
         Rect area( const Rect & r ) const;
+        Rect scale( const Rect & r ) const;
+        Rect translate( const Rect & r ) const;
 
-        // int32_t x() const
-        // {
-        //     return _x;
-        // }
-
-        // int32_t y() const
-        // {
-        //     return _y;
-        // }
-
-    protected:
+    private:
         Display & _display;
         int32_t _x;
         int32_t _y;

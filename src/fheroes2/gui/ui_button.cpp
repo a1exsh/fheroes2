@@ -152,7 +152,7 @@ namespace fheroes2
 
     Rect ButtonBase::area( const DisplayContext & ctx ) const
     {
-        return ctx.area( area() );
+        return ctx.translate( area() );
     }
 
     const Sprite & ButtonBase::_getDisabled() const

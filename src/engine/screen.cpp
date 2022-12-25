@@ -1605,6 +1605,22 @@ namespace fheroes2
         _engine->updatePalette( StandardPaletteIndexes() );
     }
 
+    fheroes2::Rect DisplayContext::area( const fheroes2::Rect & r ) const
+    {
+        return translate( scale( r ) );
+    }
+
+    fheroes2::Rect DisplayContext::scale( const fheroes2::Rect & r ) const
+    {
+        int32_t scaleFactor = _display.scaleFactor();
+        return { r.x * scaleFactor, r.y * scaleFactor, r.width * scaleFactor, r.height * scaleFactor };
+    }
+
+    fheroes2::Rect DisplayContext::translate( const fheroes2::Rect & r ) const
+    {
+        return { _x + r.x, _y + r.y, r.width, r.height };
+    }
+
     bool Cursor::isFocusActive() const
     {
         return engine().isMouseCursorActive();
