@@ -52,7 +52,7 @@ public:
     int w( size_t s, size_t c ) const;
     int h( int width ) const;
 
-    void blit( int32_t ax, int32_t ay, int maxw, fheroes2::Image & dst = fheroes2::Display::instance() ) const;
+    void blit( int32_t ax, int32_t ay, int maxw, fheroes2::AbstractDrawable & dst = fheroes2::Display::instance() ) const;
     static int charWidth( const uint8_t character, const int ft );
     static int fontHeight( const int ft );
 
@@ -180,7 +180,7 @@ int TextAscii::h( int width ) const
     return res;
 }
 
-void TextAscii::blit( int32_t ax, int32_t ay, int maxw, fheroes2::Image & dst ) const
+void TextAscii::blit( int32_t ax, int32_t ay, int maxw, fheroes2::AbstractDrawable & dst ) const
 {
     if ( _message.empty() )
         return;
@@ -272,17 +272,17 @@ size_t Text::Size() const
     return message->size();
 }
 
-void Text::Blit( const fheroes2::Point & dst_pt, fheroes2::Image & dst ) const
+void Text::Blit( const fheroes2::Point & dst_pt, fheroes2::AbstractDrawable & dst ) const
 {
     return message->blit( dst_pt.x, dst_pt.y, 0, dst );
 }
 
-void Text::Blit( int32_t ax, int32_t ay, fheroes2::Image & dst ) const
+void Text::Blit( int32_t ax, int32_t ay, fheroes2::AbstractDrawable & dst ) const
 {
     return message->blit( ax, ay, 0, dst );
 }
 
-void Text::Blit( int32_t ax, int32_t ay, int maxw, fheroes2::Image & dst ) const
+void Text::Blit( int32_t ax, int32_t ay, int maxw, fheroes2::AbstractDrawable & dst ) const
 {
     return message->blit( ax, ay, maxw, dst );
 }
@@ -407,7 +407,7 @@ void TextBox::Append( const std::string & msg, int ft, uint32_t width_ )
     }
 }
 
-void TextBox::Blit( int32_t ax, int32_t ay, fheroes2::Image & sf )
+void TextBox::Blit( int32_t ax, int32_t ay, fheroes2::AbstractDrawable & sf )
 {
     fheroes2::Rect::x = ax;
     fheroes2::Rect::y = ay;

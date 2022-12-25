@@ -3439,7 +3439,8 @@ namespace fheroes2
                         scaled._disableTransformLayer();
                     }
 
-                    Resize( original, scaled, false );
+                    const bool subpixel = imgScaleFactor > displayScaleFactor;
+                    Resize( original, scaled, subpixel );
                     _icnVsSprite[id][i] = scaled;
                 }
             }

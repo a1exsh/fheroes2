@@ -118,14 +118,14 @@ namespace Dialog
 
         const fheroes2::Rect & GetArea() const
         {
-            return area;
+            return _area;
         }
 
         void redraw();
 
     protected:
         std::unique_ptr<fheroes2::ImageRestorer> _restorer;
-        fheroes2::Rect area;
+        fheroes2::Rect _area;
 
     private:
         fheroes2::Point _position;

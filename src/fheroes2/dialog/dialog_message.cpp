@@ -67,6 +67,7 @@ int Dialog::Message( const std::string & header, const std::string & message, in
     outputInTextSupportMode( header, message, buttons );
 
     fheroes2::Display & display = fheroes2::Display::instance();
+    fheroes2::DisplayContext root = display.getContext();
 
     // setup cursor
     const CursorRestorer cursorRestorer( buttons != 0, Cursor::POINTER );
@@ -74,19 +75,20 @@ int Dialog::Message( const std::string & header, const std::string & message, in
     TextBox textbox1( header, Font::YELLOW_BIG, BOXAREA_WIDTH );
     TextBox textbox2( message, ft, BOXAREA_WIDTH );
 
-    const int32_t headerHeight = !header.empty() ? textbox1.h() + 10 : 0;
-    FrameBox box( 10 + headerHeight + textbox2.h(), buttons != 0 );
+    const int32_t headerHeight = !header.empty() ? textbox1.h() + root.scale( 10 ) : 0;
+    FrameBox box( root.scale( 10 ) + headerHeight + textbox2.h(), buttons != 0 );
     const fheroes2::Rect & pos = box.GetArea();
 
+    fheroes2::DisplayContext ctx = display.getContext( pos.x, pos.y );
     if ( !header.empty() )
-        textbox1.Blit( pos.x, pos.y + 10 );
+        textbox1.Blit( 0, ctx.scale( 10 ), ctx );
     if ( !message.empty() )
-        textbox2.Blit( pos.x, pos.y + 10 + headerHeight );
+        textbox2.Blit( 0, ctx.scale( 10 ) + headerHeight, ctx );
 
     LocalEvent & le = LocalEvent::Get();
 
     fheroes2::ButtonGroup group( pos, buttons );
-    group.draw();
+    group.draw( /*ctx*/ );
 
     display.render();
 
@@ -96,7 +98,7 @@ int Dialog::Message( const std::string & header, const std::string & message, in
     while ( result == Dialog::ZERO && le.HandleEvents() ) {
         if ( !buttons && !le.MousePressRight() )
             break;
-        result = group.processEvents();
+        result = group.processEvents( /*ctx*/ );
     }
 
     return result;

@@ -331,18 +331,18 @@ namespace fheroes2
         return *_button[id];
     }
 
-    int ButtonGroup::processEvents()
+    int ButtonGroup::processEvents( DisplayContext ctx )
     {
         LocalEvent & le = LocalEvent::Get();
 
         for ( size_t i = 0; i < _button.size(); ++i ) {
             if ( _button[i]->isEnabled() ) {
-                le.MousePressLeft( _button[i]->area() ) ? _button[i]->drawOnPress() : _button[i]->drawOnRelease();
+                le.MousePressLeft( _button[i]->area( ctx ) ) ? _button[i]->drawOnPress( ctx ) : _button[i]->drawOnRelease( ctx );
             }
         }
 
         for ( size_t i = 0; i < _button.size(); ++i ) {
-            if ( _button[i]->isEnabled() && le.MouseClickLeft( _button[i]->area() ) ) {
+            if ( _button[i]->isEnabled() && le.MouseClickLeft( _button[i]->area( ctx ) ) ) {
                 return _value[i];
             }
         }

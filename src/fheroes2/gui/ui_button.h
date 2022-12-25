@@ -189,7 +189,7 @@ namespace fheroes2
             return _button.size();
         }
 
-        int processEvents();
+        int processEvents( DisplayContext ctx = Display::instance().getContext() );
 
     private:
         std::vector<ButtonBase *> _button;

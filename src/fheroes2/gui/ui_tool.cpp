@@ -53,9 +53,6 @@ namespace
             if ( !Settings::Get().isSystemInfoEnabled() )
                 return;
 
-            const int32_t offsetX = 26;
-            const int32_t offsetY = fheroes2::Display::instance().height() - 30;
-
             const tm tmi = System::GetTM( std::time( nullptr ) );
 
             char mbstr[10] = { 0 };
@@ -88,8 +85,8 @@ namespace
                 info += std::to_string( static_cast<int>( ( averageFps - currentFps ) * 10 ) );
             }
 
-            _text.SetPos( offsetX, offsetY );
             _text.SetText( info );
+            _text.SetPos( 26, fheroes2::Display::instance().height() - _text.h() - 16 );
             _text.Show();
         }
 

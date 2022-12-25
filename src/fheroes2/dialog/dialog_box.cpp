@@ -86,9 +86,9 @@ namespace
         return leftWidth( isEvilInterface ) + rightWidth( isEvilInterface );
     }
 
-    int32_t leftOffset( const bool isEvilInterface )
+    int32_t leftOffset( fheroes2::DisplayContext & ctx, const bool isEvilInterface )
     {
-        return leftWidth( isEvilInterface ) - windowWidth / 2;
+        return leftWidth( isEvilInterface ) - ctx.scale( windowWidth ) / 2;
     }
 }
 
@@ -96,31 +96,34 @@ Dialog::NonFixedFrameBox::NonFixedFrameBox( int height, int startYPos, bool show
     : _middleFragmentCount( 0 )
     , _middleFragmentHeight( 0 )
 {
+    fheroes2::Display & display = fheroes2::Display::instance();
+    fheroes2::DisplayContext rootCtx = display.getContext();
+
     if ( showButtons )
         height += buttonHeight;
 
     const bool evil = Settings::Get().isEvilInterfaceEnabled();
     _middleFragmentCount = ( height <= 2 * activeAreaHeight ? 0 : 1 + ( height - 2 * activeAreaHeight ) / activeAreaHeight );
-    _middleFragmentHeight = height <= 2 * activeAreaHeight ? 0 : height - 2 * activeAreaHeight;
+
+    _middleFragmentHeight = rootCtx.scale( height <= 2 * activeAreaHeight ? 0 : height - 2 * activeAreaHeight );
     const int32_t height_top_bottom = topHeight( evil ) + bottomHeight( evil );
 
-    area.width = BOXAREA_WIDTH;
-    area.height = activeAreaHeight + activeAreaHeight + _middleFragmentHeight;
+    _area.width = rootCtx.scale( BOXAREA_WIDTH );
+    _area.height = rootCtx.scale( 2 * activeAreaHeight + activeAreaHeight ) + _middleFragmentHeight;
 
-    fheroes2::Display & display = fheroes2::Display::instance();
-    const int32_t leftSideOffset = leftOffset( evil );
+    const int32_t leftSideOffset = leftOffset( rootCtx, evil );
 
-    _position.x = ( display.width() - windowWidth ) / 2 - leftSideOffset;
+    _position.x = ( display.width() - rootCtx.scale( windowWidth ) ) / 2 - leftSideOffset;
     _position.y = startYPos;
 
     if ( startYPos < 0 ) {
-        _position.y = ( ( display.height() - _middleFragmentHeight ) / 2 ) - topHeight( evil );
+        _position.y = ( display.height() - _middleFragmentHeight ) / 2 - topHeight( evil );
     }
 
     _restorer.reset( new fheroes2::ImageRestorer( display, _position.x, _position.y, overallWidth( evil ), height_top_bottom + _middleFragmentHeight ) );
 
-    area.x = _position.x + ( windowWidth - BOXAREA_WIDTH ) / 2 + leftSideOffset;
-    area.y = _position.y + ( topHeight( evil ) - activeAreaHeight );
+    _area.x = _position.x + rootCtx.scale( windowWidth - BOXAREA_WIDTH ) / 2 + leftSideOffset;
+    _area.y = _position.y + topHeight( evil ) - rootCtx.scale( activeAreaHeight );
 
     redraw();
 }
@@ -138,6 +141,7 @@ void Dialog::NonFixedFrameBox::redraw()
     const fheroes2::Sprite & part4 = fheroes2::AGG::GetICN( buybuild, 4 );
 
     fheroes2::Display & display = fheroes2::Display::instance();
+    fheroes2::DisplayContext rootCtx = display.getContext();
 
     fheroes2::Blit( part4, display, _position.x + overallLeftWidth - part4.width(), _position.y );
     fheroes2::Blit( part0, display, _position.x + overallLeftWidth, _position.y );
@@ -147,7 +151,7 @@ void Dialog::NonFixedFrameBox::redraw()
     const int32_t posBeforeMiddle = _position.y;
     int32_t middleLeftHeight = _middleFragmentHeight;
     for ( uint32_t i = 0; i < _middleFragmentCount; ++i ) {
-        const int32_t chunkHeight = middleLeftHeight >= activeAreaHeight ? activeAreaHeight : middleLeftHeight;
+        const int32_t chunkHeight = middleLeftHeight >= rootCtx.scale( activeAreaHeight ) ? rootCtx.scale( activeAreaHeight ) : middleLeftHeight;
         // left-middle
         const fheroes2::Sprite & sl = fheroes2::AGG::GetICN( buybuild, 5 );
         fheroes2::Blit( sl, 0, 10, display, _position.x + overallLeftWidth - sl.width(), _position.y, sl.width(), chunkHeight );

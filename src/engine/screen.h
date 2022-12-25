@@ -186,7 +186,7 @@ namespace fheroes2
             _postprocessing = postprocessing;
         }
 
-        DisplayContext getContext( int32_t x, int32_t y );
+        DisplayContext getContext( int32_t x = 0, int32_t y = 0 );
 
         // For 8-bit mode we return a pointer to direct surface which we draw on screen
         uint8_t * image() override;
