@@ -554,8 +554,8 @@ namespace fheroes2
 
             _width = image._width;
             _height = image._height;
-            _scaleFactor = image._scaleFactor;
         }
+        _scaleFactor = image._scaleFactor;
 
         memcpy( _data.get(), image._data.get(), size * 2 );
     }

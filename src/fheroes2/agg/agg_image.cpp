@@ -3433,7 +3433,7 @@ namespace fheroes2
 
                     // resize the image to match the display's scale factor
                     Sprite scaled( original.width() * displayScaleFactor / imgScaleFactor, original.height() * displayScaleFactor / imgScaleFactor,
-                                   original.x() * displayScaleFactor / imgScaleFactor, original.y() * displayScaleFactor / imgScaleFactor );
+                                   original.x() * displayScaleFactor / imgScaleFactor, original.y() * displayScaleFactor / imgScaleFactor, displayScaleFactor );
 
                     if ( original.singleLayer() ) {
                         scaled._disableTransformLayer();
