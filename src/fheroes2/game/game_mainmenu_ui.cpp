@@ -31,8 +31,9 @@ namespace fheroes2
 {
     void drawMainMenuScreen()
     {
-        Display & display = Display::instance();
         const Image & background = AGG::GetICN( ICN::HEROES, 0 );
+
+        Display & display = Display::instance();
         DisplayContext ctx = display.getContext( ( display.width() - background.width() ) / 2, ( display.height() - background.height() ) / 2 );
 
         Blit( background, ctx );

@@ -131,12 +131,6 @@ namespace
         fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
 
         fheroes2::ImageRestorer emptyDialogRestorer( display, windowRoi.x, windowRoi.y, windowRoi.width, windowRoi.height );
-
-        // const fheroes2::Rect windowResolutionRoi( resolutionRoi + windowRoi.getPosition() );
-        // const fheroes2::Rect windowModeRoi( modeRoi + windowRoi.getPosition() );
-        // const fheroes2::Rect windowVSyncRoi( vSyncRoi + windowRoi.getPosition() );
-        // const fheroes2::Rect windowSystemInfoRoi( systemInfoRoi + windowRoi.getPosition() );
-
         fheroes2::DisplayContext ctx = display.getContext( windowRoi.x, windowRoi.y );
 
         auto drawOptions = []( fheroes2::DisplayContext & c ) {
