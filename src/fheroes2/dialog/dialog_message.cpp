@@ -67,7 +67,7 @@ int Dialog::Message( const std::string & header, const std::string & message, in
     outputInTextSupportMode( header, message, buttons );
 
     fheroes2::Display & display = fheroes2::Display::instance();
-    fheroes2::DisplayContext rootCtx = display.getContext();
+    // fheroes2::DisplayContext rootCtx = display.getContext();
 
     // setup cursor
     const CursorRestorer cursorRestorer( buttons != 0, Cursor::POINTER );
@@ -75,15 +75,15 @@ int Dialog::Message( const std::string & header, const std::string & message, in
     TextBox textbox1( header, Font::YELLOW_BIG, BOXAREA_WIDTH );
     TextBox textbox2( message, ft, BOXAREA_WIDTH );
 
-    const int32_t headerHeight = !header.empty() ? rootCtx.scale( textbox1.h() + 10 ) : 0;
-    FrameBox box( rootCtx.scale( textbox2.h() + 10 ) + headerHeight, buttons != 0 );
+    const int32_t headerHeight = !header.empty() ? textbox1.h() + 10 : 0;
+    FrameBox box( textbox2.h() + 10 + headerHeight, buttons != 0 );
     const fheroes2::Rect & pos = box.GetArea();
 
     fheroes2::DisplayContext ctx = display.getContext( pos.x, pos.y );
     if ( !header.empty() )
         textbox1.Blit( 0, ctx.scale( 10 ), ctx );
     if ( !message.empty() )
-        textbox2.Blit( 0, ctx.scale( 10 ) + headerHeight, ctx );
+        textbox2.Blit( 0, ctx.scale( 10 + headerHeight ), ctx );
 
     LocalEvent & le = LocalEvent::Get();
 
