@@ -1336,7 +1336,7 @@ namespace fheroes2
             height -= offsetY;
         }
 
-        Sprite out( width, height );
+        Sprite out( width, height, image.scaleFactor() );
         if ( image.singleLayer() ) {
             out._disableTransformLayer();
         }
