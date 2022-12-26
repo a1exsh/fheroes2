@@ -1300,7 +1300,7 @@ namespace fheroes2
         return contour;
     }
 
-    Sprite Crop( const Image & image, int32_t x, int32_t y, int32_t width, int32_t height )
+    Sprite Crop( const AbstractDrawable & image, int32_t x, int32_t y, int32_t width, int32_t height )
     {
         if ( image.empty() || width <= 0 || height <= 0 )
             return Sprite();
@@ -1336,7 +1336,7 @@ namespace fheroes2
             height -= offsetY;
         }
 
-        Sprite out( width, height, image.scaleFactor() );
+        Sprite out( width, height, 0, 0, image.scaleFactor() );
         if ( image.singleLayer() ) {
             out._disableTransformLayer();
         }

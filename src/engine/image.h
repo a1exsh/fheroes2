@@ -292,7 +292,7 @@ namespace fheroes2
 
     Sprite CreateContour( const Image & image, uint8_t value );
 
-    Sprite Crop( const Image & image, int32_t x, int32_t y, int32_t width, int32_t height );
+    Sprite Crop( const AbstractDrawable & image, int32_t x, int32_t y, int32_t width, int32_t height );
 
     // skipFactor is responsible for non-solid line. You can interpret it as skip every N pixel
     void DrawBorder( Image & image, uint8_t value, uint32_t skipFactor = 0 );
