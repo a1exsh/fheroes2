@@ -88,11 +88,14 @@ size_t TextAscii::size() const
 
 int TextAscii::charWidth( const uint8_t character, const int ft )
 {
+    // FIXME: no messing with the display's scale factor directly!
+    fheroes2::Display & display = fheroes2::Display::instance();
+
     if ( character < 0x21 || character > fheroes2::AGG::ASCIILastSupportedCharacter( ft ) ) {
         if ( isSmallFont( ft ) )
-            return 4;
+            return 4 * display.scaleFactor();
         else
-            return 6;
+            return 6 * display.scaleFactor();
     }
     else {
         return fheroes2::AGG::GetLetter( character, ft ).width();
@@ -101,10 +104,13 @@ int TextAscii::charWidth( const uint8_t character, const int ft )
 
 int TextAscii::fontHeight( const int f )
 {
+    // FIXME: no messing with the display's scale factor directly!
+    fheroes2::Display & display = fheroes2::Display::instance();
+
     if ( isSmallFont( f ) )
-        return 8 + 2 + 1;
+        return ( 8 + 2 + 1 ) * display.scaleFactor();
     else
-        return 13 + 3 + 1;
+        return ( 13 + 3 + 1 ) * display.scaleFactor();
 }
 
 int TextAscii::w( size_t s, size_t c ) const

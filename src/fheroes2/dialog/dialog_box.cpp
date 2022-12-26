@@ -104,8 +104,14 @@ Dialog::NonFixedFrameBox::NonFixedFrameBox( int height, int startYPos, bool show
 
     const bool evil = Settings::Get().isEvilInterfaceEnabled();
 
-    _middleFragmentCount = ( height <= 2 * ACTIVE_AREA_HEIGHT ? 0 : 1 + ( height - 2 * ACTIVE_AREA_HEIGHT ) / ACTIVE_AREA_HEIGHT );
-    _middleFragmentHeight = rootCtx.scale( height <= 2 * ACTIVE_AREA_HEIGHT ? 0 : height - 2 * ACTIVE_AREA_HEIGHT );
+    if ( height <= rootCtx.scale( 2 * ACTIVE_AREA_HEIGHT ) ) {
+        _middleFragmentHeight = 0;
+        _middleFragmentCount = 0;
+    }
+    else {
+        _middleFragmentHeight = height - rootCtx.scale( 2 * ACTIVE_AREA_HEIGHT );
+        _middleFragmentCount = 1 + _middleFragmentHeight / rootCtx.scale( ACTIVE_AREA_HEIGHT );
+    }
 
     _area.width = rootCtx.scale( BOXAREA_WIDTH );
     _area.height = rootCtx.scale( 2 * ACTIVE_AREA_HEIGHT ) + _middleFragmentHeight;
