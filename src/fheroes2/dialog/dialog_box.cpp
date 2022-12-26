@@ -108,7 +108,7 @@ Dialog::NonFixedFrameBox::NonFixedFrameBox( int height, int startYPos, bool show
     _middleFragmentHeight = rootCtx.scale( height <= 2 * ACTIVE_AREA_HEIGHT ? 0 : height - 2 * ACTIVE_AREA_HEIGHT );
 
     _area.width = rootCtx.scale( BOXAREA_WIDTH );
-    _area.height = rootCtx.scale( 2 * ACTIVE_AREA_HEIGHT + ACTIVE_AREA_HEIGHT ) + _middleFragmentHeight;
+    _area.height = rootCtx.scale( 2 * ACTIVE_AREA_HEIGHT ) + _middleFragmentHeight;
 
     const int32_t leftSideOffset = leftOffset( rootCtx, evil );
 
