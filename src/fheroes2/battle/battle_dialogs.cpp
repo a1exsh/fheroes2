@@ -573,22 +573,24 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
     const fheroes2::Sprite & dialogShadow = fheroes2::AGG::GetICN( ( isEvilInterface ? ICN::WINLOSEE : ICN::WINLOSE ), 1 );
 
     const fheroes2::Point dialogOffset( ( display.width() - dialog.width() ) / 2, ( display.height() - dialog.height() ) / 2 );
-    const fheroes2::Point shadowOffset( dialogOffset.x - BORDERWIDTH, dialogOffset.y );
+    fheroes2::DisplayContext ctx = display.getContext( dialogOffset.x, dialogOffset.y );
 
-    fheroes2::ImageRestorer back( display, shadowOffset.x, shadowOffset.y, dialog.width() + BORDERWIDTH, dialog.height() + BORDERWIDTH - 1 );
+    const fheroes2::Point shadowOffset( dialogOffset.x - ctx.scale( BORDERWIDTH ), dialogOffset.y );
+
+    fheroes2::ImageRestorer back( display, shadowOffset.x, shadowOffset.y, dialog.width() + ctx.scale( BORDERWIDTH ), dialog.height() + ctx.scale( BORDERWIDTH - 1 ) );
     const fheroes2::Rect windowRoi( dialogOffset.x, dialogOffset.y, dialog.width(), dialog.height() );
 
-    fheroes2::Blit( dialogShadow, display, windowRoi.x - BORDERWIDTH, windowRoi.y + BORDERWIDTH - 1 );
+    fheroes2::Blit( dialogShadow, display, windowRoi.x - ctx.scale( BORDERWIDTH ), windowRoi.y + ctx.scale( BORDERWIDTH - 1 ) );
     fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
 
-    const int anime_ox = 47;
-    const int anime_oy = 36;
+    const int anime_ox = ctx.scale( 47 );
+    const int anime_oy = ctx.scale( 36 );
 
     const fheroes2::Sprite & sequenceBase = fheroes2::AGG::GetICN( sequence.id(), 0 );
     const fheroes2::Sprite & sequenceStart = fheroes2::AGG::GetICN( sequence.id(), 1 );
 
-    fheroes2::Blit( sequenceBase, display, windowRoi.x + anime_ox + sequenceBase.x(), windowRoi.y + anime_oy + sequenceBase.y() );
-    fheroes2::Blit( sequenceStart, display, windowRoi.x + anime_ox + sequenceStart.x(), windowRoi.y + anime_oy + sequenceStart.y() );
+    fheroes2::Blit( sequenceBase, ctx, anime_ox + sequenceBase.x(), anime_oy + sequenceBase.y() );
+    fheroes2::Blit( sequenceStart, ctx, anime_ox + sequenceStart.x(), anime_oy + sequenceStart.y() );
 
     int32_t messageYOffset = 0;
     if ( !title.empty() ) {
@@ -611,7 +613,7 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
     text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 285 );
 
     if ( killed1.isValid() )
-        Army::drawSingleDetailedMonsterLine( killed1, windowRoi.x + 25, windowRoi.y + 308, 270 );
+        Army::drawSingleDetailedMonsterLine( killed1, ctx, ctx.scale( 25 ), ctx.scale( 308 ), ctx.scale( 270 ) );
     else {
         text.Set( _( "None" ), Font::SMALL );
         text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 300 );
@@ -622,15 +624,15 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
     text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 345 );
 
     if ( killed2.isValid() )
-        Army::drawSingleDetailedMonsterLine( killed2, windowRoi.x + 25, windowRoi.y + 368, 270 );
+        Army::drawSingleDetailedMonsterLine( killed2, ctx, ctx.scale( 25 ), ctx.scale( 368 ), ctx.scale( 270 ) );
     else {
         text.Set( _( "None" ), Font::SMALL );
         text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 360 );
     }
 
     if ( allowToCancel ) {
-        const fheroes2::Sprite & buttonOverride = fheroes2::Crop( dialog, 20, 410, 84, 32 );
-        fheroes2::Blit( buttonOverride, display, windowRoi.x + 116, windowRoi.y + 410 );
+        const fheroes2::Sprite & buttonOverride = fheroes2::Crop( dialog, ctx.scale( 20 ), ctx.scale( 410 ), ctx.scale( 84 ), ctx.scale( 32 ) );
+        fheroes2::Blit( buttonOverride, ctx, ctx.scale( 116 ), ctx.scale( 410 ) );
     }
 
     const int buttonOffset = allowToCancel ? 39 : 120;
@@ -639,32 +641,32 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
     const int buttonCancelICN = isEvilInterface ? ICN::BUTTON_SMALL_RESTART_EVIL : ICN::BUTTON_SMALL_RESTART_GOOD;
 
     std::unique_ptr<fheroes2::ButtonBase> btnOk;
-    fheroes2::ButtonSprite btnCancel = fheroes2::makeButtonWithShadow( windowRoi.x + buttonOffset + 129, windowRoi.y + 410, fheroes2::AGG::GetICN( buttonCancelICN, 0 ),
-                                                                       fheroes2::AGG::GetICN( buttonCancelICN, 1 ), display );
+    fheroes2::ButtonSprite btnCancel = fheroes2::makeButtonWithShadow( ctx.scale( buttonOffset + 129 ), ctx.scale( 410 ), fheroes2::AGG::GetICN( buttonCancelICN, 0 ),
+                                                                       fheroes2::AGG::GetICN( buttonCancelICN, 1 ), ctx );
 
     if ( allowToCancel ) {
-        btnCancel.draw();
-        btnOk.reset( new fheroes2::ButtonSprite( fheroes2::makeButtonWithShadow( windowRoi.x + buttonOffset, windowRoi.y + 410, fheroes2::AGG::GetICN( buttonOkICN, 0 ),
-                                                                                 fheroes2::AGG::GetICN( buttonOkICN, 1 ), display ) ) );
+        btnCancel.draw( ctx );
+        btnOk.reset( new fheroes2::ButtonSprite( fheroes2::makeButtonWithShadow( ctx.scale( buttonOffset ), ctx.scale( 410 ), fheroes2::AGG::GetICN( buttonOkICN, 0 ),
+                                                                                 fheroes2::AGG::GetICN( buttonOkICN, 1 ), ctx ) ) );
     }
     else {
-        btnOk.reset( new fheroes2::Button( windowRoi.x + buttonOffset, windowRoi.y + 410, buttonOkICN, 0, 1 ) );
+        btnOk.reset( new fheroes2::Button( ctx.scale( buttonOffset ), ctx.scale( 410 ), buttonOkICN, 0, 1 ) );
     }
-    btnOk->draw();
+    btnOk->draw( ctx );
 
     display.render();
 
     while ( le.HandleEvents() ) {
-        le.MousePressLeft( btnOk->area() ) ? btnOk->drawOnPress() : btnOk->drawOnRelease();
+        le.MousePressLeft( btnOk->area( ctx ) ) ? btnOk->drawOnPress( ctx ) : btnOk->drawOnRelease( ctx );
         if ( allowToCancel ) {
-            le.MousePressLeft( btnCancel.area() ) ? btnCancel.drawOnPress() : btnCancel.drawOnRelease();
+            le.MousePressLeft( btnCancel.area( ctx ) ) ? btnCancel.drawOnPress( ctx ) : btnCancel.drawOnRelease( ctx );
         }
 
         // exit
-        if ( Game::HotKeyCloseWindow() || le.MouseClickLeft( btnOk->area() ) )
+        if ( Game::HotKeyCloseWindow() || le.MouseClickLeft( btnOk->area( ctx ) ) )
             break;
 
-        if ( allowToCancel && le.MouseClickLeft( btnCancel.area() ) ) {
+        if ( allowToCancel && le.MouseClickLeft( btnCancel.area( ctx ) ) ) {
             // Skip artifact transfer and return to restart battle in manual mode
             return true;
         }
@@ -674,8 +676,8 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
             const fheroes2::Sprite & base = fheroes2::AGG::GetICN( sequence.id(), 0 );
             const fheroes2::Sprite & sequenceCurrent = fheroes2::AGG::GetICN( sequence.id(), sequence.frameId() );
 
-            fheroes2::Blit( base, display, windowRoi.x + anime_ox + sequenceBase.x(), windowRoi.y + anime_oy + sequenceBase.y() );
-            fheroes2::Blit( sequenceCurrent, display, windowRoi.x + anime_ox + sequenceCurrent.x(), windowRoi.y + anime_oy + sequenceCurrent.y() );
+            fheroes2::Blit( base, ctx, anime_ox + sequenceBase.x(), anime_oy + sequenceBase.y() );
+            fheroes2::Blit( sequenceCurrent, ctx, anime_ox + sequenceCurrent.x(), anime_oy + sequenceCurrent.y() );
             display.render();
         }
     }
@@ -690,16 +692,17 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
 
         const bool isWinnerHuman = winner && winner->isControlHuman();
 
-        btnOk.reset( new fheroes2::Button( windowRoi.x + 120, windowRoi.y + 410, isEvilInterface ? ICN::WINCMBBE : ICN::WINCMBTB, 0, 1 ) );
+        btnOk.reset( new fheroes2::Button( ctx.scale( 120 ), ctx.scale( 410 ), isEvilInterface ? ICN::WINCMBBE : ICN::WINCMBTB, 0, 1 ) );
 
         for ( const Artifact & art : artifacts ) {
             if ( isWinnerHuman || art.isUltimate() ) { // always show the message for ultimate artifacts
                 back.restore();
-                back.update( shadowOffset.x, shadowOffset.y, dialog.width() + BORDERWIDTH, dialog.height() + BORDERWIDTH - 1 );
-                fheroes2::Blit( dialogShadow, display, windowRoi.x - BORDERWIDTH, windowRoi.y + BORDERWIDTH - 1 );
-                fheroes2::Blit( dialog, display, windowRoi.x, windowRoi.y );
+                back.update( shadowOffset.x, shadowOffset.y, dialog.width() + ctx.scale( BORDERWIDTH ), dialog.height() + ctx.scale( BORDERWIDTH - 1 ) );
+                // can't use negative coords with the context
+                fheroes2::Blit( dialogShadow, display, windowRoi.x - ctx.scale( BORDERWIDTH ), windowRoi.y + ctx.scale( BORDERWIDTH - 1 ) );
+                fheroes2::Blit( dialog, ctx );
 
-                btnOk->draw();
+                btnOk->draw( ctx );
 
                 std::string artMsg;
                 if ( art.isUltimate() ) {
@@ -721,10 +724,10 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
 
                 const fheroes2::Sprite & border = fheroes2::AGG::GetICN( ICN::WINLOSEB, 0 );
                 const fheroes2::Sprite & artifact = fheroes2::AGG::GetICN( ICN::ARTIFACT, art.IndexSprite64() );
-                const fheroes2::Point artifactOffset( windowRoi.x + 119, windowRoi.y + 310 );
+                const fheroes2::Point artifactOffset( ctx.scale( 119 ), ctx.scale( 310 ) );
 
-                fheroes2::Blit( border, display, artifactOffset.x, artifactOffset.y );
-                fheroes2::Blit( artifact, display, artifactOffset.x + 8, artifactOffset.y + 8 );
+                fheroes2::Blit( border, ctx, artifactOffset.x, artifactOffset.y );
+                fheroes2::Blit( artifact, ctx, artifactOffset.x + ctx.scale( 8 ), artifactOffset.y + ctx.scale( 8 ) );
 
                 TextBox artName( art.GetName(), Font::SMALL, bsTextWidth );
                 artName.Blit( windowRoi.x + bsTextXOffset, artifactOffset.y + border.height() + 5 );
@@ -732,7 +735,7 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
                 const fheroes2::Rect artifactArea( artifactOffset.x, artifactOffset.y, border.width(), border.height() );
 
                 while ( le.HandleEvents() ) {
-                    le.MousePressLeft( btnOk->area() ) ? btnOk->drawOnPress() : btnOk->drawOnRelease();
+                    le.MousePressLeft( btnOk->area( ctx ) ) ? btnOk->drawOnPress( ctx ) : btnOk->drawOnRelease( ctx );
 
                     // display captured artifact info on right click
                     if ( le.MousePressRight( artifactArea ) ) {
@@ -740,7 +743,7 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
                     }
 
                     // exit
-                    if ( Game::HotKeyCloseWindow() || le.MouseClickLeft( btnOk->area() ) )
+                    if ( Game::HotKeyCloseWindow() || le.MouseClickLeft( btnOk->area( ctx ) ) )
                         break;
 
                     // animation
@@ -748,8 +751,8 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
                         const fheroes2::Sprite & base = fheroes2::AGG::GetICN( sequence.id(), 0 );
                         const fheroes2::Sprite & sequenceCurrent = fheroes2::AGG::GetICN( sequence.id(), sequence.frameId() );
 
-                        fheroes2::Blit( base, display, windowRoi.x + anime_ox + sequenceBase.x(), windowRoi.y + anime_oy + sequenceBase.y() );
-                        fheroes2::Blit( sequenceCurrent, display, windowRoi.x + anime_ox + sequenceCurrent.x(), windowRoi.y + anime_oy + sequenceCurrent.y() );
+                        fheroes2::Blit( base, ctx, anime_ox + sequenceBase.x(), anime_oy + sequenceBase.y() );
+                        fheroes2::Blit( sequenceCurrent, ctx, anime_ox + sequenceCurrent.x(), anime_oy + sequenceCurrent.y() );
                         display.render();
                     }
                 }

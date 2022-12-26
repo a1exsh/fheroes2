@@ -433,7 +433,7 @@ namespace fheroes2
         }
     }
 
-    ButtonSprite makeButtonWithBackground( int32_t offsetX, int32_t offsetY, const Sprite & released, const Sprite & pressed, const Image & background )
+    ButtonSprite makeButtonWithBackground( int32_t offsetX, int32_t offsetY, const Sprite & released, const Sprite & pressed, const AbstractDrawable & background )
     {
         const Sprite croppedBackground = Crop( background, offsetX, offsetY, released.width(), released.height() );
 
@@ -456,9 +456,10 @@ namespace fheroes2
         return { offsetX, offsetY, releasedWithBackground, pressedWithBackground, disabledWithBackground };
     }
 
-    ButtonSprite makeButtonWithShadow( int32_t offsetX, int32_t offsetY, const Sprite & released, const Sprite & pressed, const Image & background,
+    ButtonSprite makeButtonWithShadow( int32_t offsetX, int32_t offsetY, const Sprite & released, const Sprite & pressed, const AbstractDrawable & background,
                                        const Point & shadowOffset )
     {
+        // TODO: scale factor for the defeault shadow offset
         const Sprite & shadow = fheroes2::makeShadow( released, shadowOffset, 3 );
 
         Sprite croppedBackground = Crop( background, offsetX + shadow.x(), offsetY + shadow.y(), shadow.width(), shadow.height() );

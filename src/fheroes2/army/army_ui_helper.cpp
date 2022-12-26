@@ -32,7 +32,7 @@
 #include "ui_text.h"
 
 void fheroes2::drawMiniMonsters( const Troops & troops, int32_t cx, const int32_t cy, const uint32_t width, uint32_t first, uint32_t count, const bool isCompact,
-                                 const bool isDetailedView, const bool isGarrisonView, const uint32_t thievesGuildsCount, Image & output )
+                                 const bool isDetailedView, const bool isGarrisonView, const uint32_t thievesGuildsCount, DisplayContext & ctx )
 {
     if ( !troops.isValid() ) {
         return;
@@ -79,17 +79,17 @@ void fheroes2::drawMiniMonsters( const Troops & troops, int32_t cx, const int32_
 
         // This is the drawing of army troops in compact form in the small info window beneath resources
         if ( isCompact ) {
-            const int offsetY = ( monster.height() < 37 ) ? 37 - monster.height() : 0;
-            int offset = ( chunk - monster.width() - text.width() ) / 2;
-            if ( offset < 0 )
-                offset = 0;
-            fheroes2::Blit( monster, output, cx + offset, cy + offsetY + monster.y() );
-            text.draw( cx + chunk - text.width() - offset, cy + 23, output );
+            const int offsetY = std::max( 0, ctx.scale( 37 ) - monster.height() );
+            const int offsetX = std::max( 0, ( chunk - monster.width() - text.width() ) / 2 );
+            fheroes2::Blit( monster, ctx, cx + offsetX, cy + offsetY + monster.y() );
+
+            text.draw( cx + chunk - text.width() - offsetX, cy + 23, ctx );
         }
         else {
-            const int offsetY = 28 - monster.height();
-            fheroes2::Blit( monster, output, cx - monster.width() / 2 + monster.x() + 2, cy + offsetY + monster.y() );
-            text.draw( cx - text.width() / 2, cy + 29, output );
+            const int offsetY = std::max( 0, ctx.scale( 28 ) - monster.height() );
+            fheroes2::Blit( monster, ctx, cx - monster.width() / 2 + monster.x() + 2, cy + offsetY + monster.y() );
+
+            text.draw( cx - text.width() / 2, cy + ctx.scale( 29 ), ctx );
         }
         cx += chunk;
         --count;

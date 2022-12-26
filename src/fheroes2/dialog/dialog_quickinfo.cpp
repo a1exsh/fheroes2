@@ -937,7 +937,8 @@ void Dialog::QuickInfo( const HeroBase & hero, const fheroes2::Point & position 
             text.draw( dst_pt.x, dst_pt.y, display );
         }
 
-        Army::drawSingleDetailedMonsterLine( hero.GetArmy(), cur_rt.x - 7, cur_rt.y + 117, 160 );
+        fheroes2::DisplayContext rootCtx = display.getContext(); // FIXME
+        Army::drawSingleDetailedMonsterLine( hero.GetArmy(), rootCtx, cur_rt.x - 7, cur_rt.y + 117, 160 );
     }
     else {
         // show limited

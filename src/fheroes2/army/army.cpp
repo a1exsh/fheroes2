@@ -1389,9 +1389,9 @@ bool Army::isMeleeDominantArmy() const
     return meleeInfantry > other;
 }
 
-void Army::drawSingleDetailedMonsterLine( const Troops & troops, int32_t cx, int32_t cy, uint32_t width )
+void Army::drawSingleDetailedMonsterLine( const Troops & troops, fheroes2::DisplayContext & ctx, int32_t cx, int32_t cy, uint32_t width )
 {
-    fheroes2::drawMiniMonsters( troops, cx, cy, width, 0, 0, false, true, false, 0, fheroes2::Display::instance() );
+    fheroes2::drawMiniMonsters( troops, cx, cy, width, 0, 0, false, true, false, 0, ctx );
 }
 
 void Army::drawMultipleMonsterLines( const Troops & troops, int32_t posX, int32_t posY, uint32_t lineWidth, bool isCompact, const bool isDetailedView,
@@ -1401,21 +1401,18 @@ void Army::drawMultipleMonsterLines( const Troops & troops, int32_t posX, int32_
     const int offsetX = lineWidth / 6;
     const int offsetY = isCompact ? 31 : 49;
 
-    fheroes2::Image & output = fheroes2::Display::instance();
-
+    fheroes2::DisplayContext ctx = fheroes2::Display::instance().getContext( posX, posY );
     if ( count < 3 ) {
-        fheroes2::drawMiniMonsters( troops, posX + offsetX, posY + offsetY / 2 + 1, lineWidth * 2 / 3, 0, 0, isCompact, isDetailedView, isGarrisonView,
-                                    thievesGuildsCount, output );
+        fheroes2::drawMiniMonsters( troops, offsetX, offsetY / 2 + 1, lineWidth * 2 / 3, 0, 0, isCompact, isDetailedView, isGarrisonView, thievesGuildsCount, ctx );
     }
     else {
         const int firstLineTroopCount = 2;
         const int secondLineTroopCount = count - firstLineTroopCount;
         const int secondLineWidth = secondLineTroopCount == 2 ? lineWidth * 2 / 3 : lineWidth;
 
-        fheroes2::drawMiniMonsters( troops, posX + offsetX, posY, lineWidth * 2 / 3, 0, firstLineTroopCount, isCompact, isDetailedView, isGarrisonView,
-                                    thievesGuildsCount, output );
-        fheroes2::drawMiniMonsters( troops, posX, posY + offsetY, secondLineWidth, firstLineTroopCount, secondLineTroopCount, isCompact, isDetailedView, isGarrisonView,
-                                    thievesGuildsCount, output );
+        fheroes2::drawMiniMonsters( troops, offsetX, 0, lineWidth * 2 / 3, 0, firstLineTroopCount, isCompact, isDetailedView, isGarrisonView, thievesGuildsCount, ctx );
+        fheroes2::drawMiniMonsters( troops, 0, offsetY, secondLineWidth, firstLineTroopCount, secondLineTroopCount, isCompact, isDetailedView, isGarrisonView,
+                                    thievesGuildsCount, ctx );
     }
 }
 

@@ -335,31 +335,35 @@ namespace Battle
 
         void SetPosition( uint32_t px, uint32_t py )
         {
+            fheroes2::DisplayContext rootCtx = fheroes2::Display::instance().getContext();
+
             const int32_t mx = 6;
             const int32_t sw = fheroes2::Display::DEFAULT_WIDTH;
             const int32_t sh = mx * 20;
-            border.SetPosition( px, py - sh - 2, sw - 32, sh - 30 );
+            border.SetPosition( px, py - rootCtx.scale( sh - 2 ), rootCtx.scale( sw - 32 ), rootCtx.scale( sh - 30 ) );
             const fheroes2::Rect & area = border.GetArea();
-            const int32_t ax = area.x + area.width - 20;
 
             SetTopLeft( area.getPosition() );
             SetAreaMaxItems( mx );
 
-            SetScrollButtonUp( ICN::DROPLISL, 6, 7, fheroes2::Point( ax + 8, area.y - 10 ) );
-            SetScrollButtonDn( ICN::DROPLISL, 8, 9, fheroes2::Point( ax + 8, area.y + area.height - 11 ) );
+            const int32_t ax = area.x + area.width - rootCtx.scale( 20 );
+            SetScrollButtonUp( ICN::DROPLISL, 6, 7, fheroes2::Point( ax + rootCtx.scale( 8 ), area.y - rootCtx.scale( 10 ) ) );
+            SetScrollButtonDn( ICN::DROPLISL, 8, 9, fheroes2::Point( ax + rootCtx.scale( 8 ), area.y + area.height - rootCtx.scale( 11 ) ) );
 
-            const int32_t scrollbarSliderAreaLength = buttonPgDn.area().y - ( buttonPgUp.area().y + buttonPgUp.area().height ) - 7;
+            const int32_t scrollbarSliderAreaLength = buttonPgDn.area().y - ( buttonPgUp.area().y + buttonPgUp.area().height ) - rootCtx.scale( 7 );
 
-            setScrollBarArea( { ax + 5 + 8, buttonPgUp.area().y + buttonPgUp.area().height + 3, 12, scrollbarSliderAreaLength } );
+            setScrollBarArea(
+                { ax + rootCtx.scale( 5 + 8 ), buttonPgUp.area().y + buttonPgUp.area().height + rootCtx.scale( 3 ), rootCtx.scale( 12 ), scrollbarSliderAreaLength } );
 
             const fheroes2::Sprite & originalSlider = fheroes2::AGG::GetICN( ICN::DROPLISL, 13 );
             const fheroes2::Image scrollbarSlider
                 = fheroes2::generateScrollbarSlider( originalSlider, false, scrollbarSliderAreaLength, VisibleItemCount(), static_cast<int32_t>( messages.size() ),
-                                                     { 0, 0, originalSlider.width(), 4 }, { 0, 4, originalSlider.width(), 8 } );
+                                                     { 0, 0, originalSlider.width(), rootCtx.scale( 4 ) },
+                                                     { 0, rootCtx.scale( 4 ), originalSlider.width(), rootCtx.scale( 8 ) } );
 
             setScrollBarImage( scrollbarSlider );
             _scrollbar.hide();
-            SetAreaItems( { area.x, area.y, area.width - 10, area.height } );
+            SetAreaItems( { area.x, area.y, area.width - rootCtx.scale( 10 ), area.height } );
             SetListContent( messages );
         }
 
@@ -1083,8 +1087,10 @@ void Battle::ArmiesOrder::Redraw( const Unit * current, const uint8_t currentUni
 
 Battle::Interface::Interface( Arena & battleArena, const int32_t tileIndex )
     : arena( battleArena )
-    , _surfaceInnerArea( 0, 0, fheroes2::Display::DEFAULT_WIDTH, fheroes2::Display::DEFAULT_HEIGHT )
-    , _mainSurface( fheroes2::Display::DEFAULT_WIDTH, fheroes2::Display::DEFAULT_HEIGHT )
+    , _surfaceInnerArea( 0, 0, fheroes2::Display::DEFAULT_WIDTH * fheroes2::Display::instance().scaleFactor(),
+                         fheroes2::Display::DEFAULT_HEIGHT * fheroes2::Display::instance().scaleFactor() )
+    , _mainSurface( fheroes2::Display::DEFAULT_WIDTH * fheroes2::Display::instance().scaleFactor(),
+                    fheroes2::Display::DEFAULT_HEIGHT * fheroes2::Display::instance().scaleFactor() )
     , icn_cbkg( ICN::UNKNOWN )
     , icn_frng( ICN::UNKNOWN )
     , humanturn_spell( Spell::NONE )
@@ -1111,9 +1117,9 @@ Battle::Interface::Interface( Arena & battleArena, const int32_t tileIndex )
     // border
     const fheroes2::Display & display = fheroes2::Display::instance();
 
-    _interfacePosition = { ( display.width() - fheroes2::Display::DEFAULT_WIDTH ) / 2, ( display.height() - fheroes2::Display::DEFAULT_HEIGHT ) / 2,
-                           _surfaceInnerArea.width, _surfaceInnerArea.height };
-    border.SetPosition( _interfacePosition.x - BORDERWIDTH, _interfacePosition.y - BORDERWIDTH, fheroes2::Display::DEFAULT_WIDTH, fheroes2::Display::DEFAULT_HEIGHT );
+    _interfacePosition
+        = { ( display.width() - _surfaceInnerArea.width ) / 2, ( display.height() - _surfaceInnerArea.width ) / 2, _surfaceInnerArea.width, _surfaceInnerArea.height };
+    border.SetPosition( _interfacePosition.x - BORDERWIDTH, _interfacePosition.y - BORDERWIDTH, _surfaceInnerArea.width, _surfaceInnerArea.height );
 
     // damage info popup
     popup.setBattleUIRect( _interfacePosition );
