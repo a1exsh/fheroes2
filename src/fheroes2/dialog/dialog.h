@@ -121,7 +121,7 @@ namespace Dialog
             return _area;
         }
 
-        void redraw();
+        void redraw() const;
 
     protected:
         std::unique_ptr<fheroes2::ImageRestorer> _restorer;

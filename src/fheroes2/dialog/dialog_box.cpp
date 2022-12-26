@@ -35,9 +35,9 @@
 
 namespace
 {
-    const int32_t windowWidth = 288; // this is measured value
-    const int32_t buttonHeight = 40;
-    const int32_t activeAreaHeight = 35;
+    const int32_t WINDOW_WIDTH = 288; // this is measured value
+    const int32_t BUTTON_HEIGHT = 40;
+    const int32_t ACTIVE_AREA_HEIGHT = 35;
 
     int32_t topHeight( const bool isEvilInterface )
     {
@@ -88,7 +88,7 @@ namespace
 
     int32_t leftOffset( fheroes2::DisplayContext & ctx, const bool isEvilInterface )
     {
-        return leftWidth( isEvilInterface ) - ctx.scale( windowWidth ) / 2;
+        return leftWidth( isEvilInterface ) - ctx.scale( WINDOW_WIDTH ) / 2;
     }
 }
 
@@ -100,35 +100,35 @@ Dialog::NonFixedFrameBox::NonFixedFrameBox( int height, int startYPos, bool show
     fheroes2::DisplayContext rootCtx = display.getContext();
 
     if ( showButtons )
-        height += buttonHeight;
+        height += BUTTON_HEIGHT;
 
     const bool evil = Settings::Get().isEvilInterfaceEnabled();
-    _middleFragmentCount = ( height <= 2 * activeAreaHeight ? 0 : 1 + ( height - 2 * activeAreaHeight ) / activeAreaHeight );
 
-    _middleFragmentHeight = rootCtx.scale( height <= 2 * activeAreaHeight ? 0 : height - 2 * activeAreaHeight );
-    const int32_t height_top_bottom = topHeight( evil ) + bottomHeight( evil );
+    _middleFragmentCount = ( height <= 2 * ACTIVE_AREA_HEIGHT ? 0 : 1 + ( height - 2 * ACTIVE_AREA_HEIGHT ) / ACTIVE_AREA_HEIGHT );
+    _middleFragmentHeight = rootCtx.scale( height <= 2 * ACTIVE_AREA_HEIGHT ? 0 : height - 2 * ACTIVE_AREA_HEIGHT );
 
     _area.width = rootCtx.scale( BOXAREA_WIDTH );
-    _area.height = rootCtx.scale( 2 * activeAreaHeight + activeAreaHeight ) + _middleFragmentHeight;
+    _area.height = rootCtx.scale( 2 * ACTIVE_AREA_HEIGHT + ACTIVE_AREA_HEIGHT ) + _middleFragmentHeight;
 
     const int32_t leftSideOffset = leftOffset( rootCtx, evil );
 
-    _position.x = ( display.width() - rootCtx.scale( windowWidth ) ) / 2 - leftSideOffset;
+    _position.x = ( display.width() - rootCtx.scale( WINDOW_WIDTH ) ) / 2 - leftSideOffset;
     _position.y = startYPos;
 
     if ( startYPos < 0 ) {
         _position.y = ( display.height() - _middleFragmentHeight ) / 2 - topHeight( evil );
     }
 
-    _restorer.reset( new fheroes2::ImageRestorer( display, _position.x, _position.y, overallWidth( evil ), height_top_bottom + _middleFragmentHeight ) );
+    const int32_t heightTopBottom = topHeight( evil ) + bottomHeight( evil );
+    _restorer.reset( new fheroes2::ImageRestorer( display, _position.x, _position.y, overallWidth( evil ), heightTopBottom + _middleFragmentHeight ) );
 
-    _area.x = _position.x + rootCtx.scale( windowWidth - BOXAREA_WIDTH ) / 2 + leftSideOffset;
-    _area.y = _position.y + topHeight( evil ) - rootCtx.scale( activeAreaHeight );
+    _area.x = _position.x + rootCtx.scale( WINDOW_WIDTH - BOXAREA_WIDTH ) / 2 + leftSideOffset;
+    _area.y = _position.y + topHeight( evil ) - rootCtx.scale( ACTIVE_AREA_HEIGHT );
 
     redraw();
 }
 
-void Dialog::NonFixedFrameBox::redraw()
+void Dialog::NonFixedFrameBox::redraw() const
 {
     const bool isEvilInterface = Settings::Get().isEvilInterfaceEnabled();
     const int buybuild = isEvilInterface ? ICN::BUYBUILE : ICN::BUYBUILD;
@@ -141,38 +141,37 @@ void Dialog::NonFixedFrameBox::redraw()
     const fheroes2::Sprite & part4 = fheroes2::AGG::GetICN( buybuild, 4 );
 
     fheroes2::Display & display = fheroes2::Display::instance();
-    fheroes2::DisplayContext rootCtx = display.getContext();
+    fheroes2::DisplayContext ctx = display.getContext( _position.x, _position.y );
 
-    fheroes2::Blit( part4, display, _position.x + overallLeftWidth - part4.width(), _position.y );
-    fheroes2::Blit( part0, display, _position.x + overallLeftWidth, _position.y );
+    fheroes2::Blit( part4, ctx, overallLeftWidth - part4.width(), 0 );
+    fheroes2::Blit( part0, ctx, overallLeftWidth, 0 );
 
-    _position.y += part4.height();
+    int32_t offsetY = part4.height();
 
-    const int32_t posBeforeMiddle = _position.y;
     int32_t middleLeftHeight = _middleFragmentHeight;
     for ( uint32_t i = 0; i < _middleFragmentCount; ++i ) {
-        const int32_t chunkHeight = middleLeftHeight >= rootCtx.scale( activeAreaHeight ) ? rootCtx.scale( activeAreaHeight ) : middleLeftHeight;
+        const int32_t chunkHeight = middleLeftHeight >= ctx.scale( ACTIVE_AREA_HEIGHT ) ? ctx.scale( ACTIVE_AREA_HEIGHT ) : middleLeftHeight;
         // left-middle
         const fheroes2::Sprite & sl = fheroes2::AGG::GetICN( buybuild, 5 );
-        fheroes2::Blit( sl, 0, 10, display, _position.x + overallLeftWidth - sl.width(), _position.y, sl.width(), chunkHeight );
+        fheroes2::Blit( sl, 0, 10, ctx, overallLeftWidth - sl.width(), offsetY, sl.width(), chunkHeight );
 
         // right-middle
         const fheroes2::Sprite & sr = fheroes2::AGG::GetICN( buybuild, 1 );
-        fheroes2::Blit( sr, 0, 10, display, _position.x + overallLeftWidth, _position.y, sr.width(), chunkHeight );
+        fheroes2::Blit( sr, 0, 10, ctx, overallLeftWidth, offsetY, sr.width(), chunkHeight );
 
         middleLeftHeight -= chunkHeight;
-        _position.y += chunkHeight;
+        offsetY += chunkHeight;
     }
-
-    _position.y = posBeforeMiddle + _middleFragmentHeight;
 
     // right-bottom
     const fheroes2::Sprite & part2 = fheroes2::AGG::GetICN( buybuild, 2 );
     // left-bottom
     const fheroes2::Sprite & part6 = fheroes2::AGG::GetICN( buybuild, 6 );
 
-    fheroes2::Blit( part6, display, _position.x + overallLeftWidth - part6.width(), _position.y );
-    fheroes2::Blit( part2, display, _position.x + overallLeftWidth, _position.y );
+    offsetY = part4.height() + _middleFragmentHeight;
+
+    fheroes2::Blit( part6, ctx, overallLeftWidth - part6.width(), offsetY );
+    fheroes2::Blit( part2, ctx, overallLeftWidth, offsetY );
 }
 
 Dialog::NonFixedFrameBox::~NonFixedFrameBox()
