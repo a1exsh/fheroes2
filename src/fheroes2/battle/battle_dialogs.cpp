@@ -594,40 +594,40 @@ bool Battle::Arena::DialogBattleSummary( const Result & res, const std::vector<A
 
     int32_t messageYOffset = 0;
     if ( !title.empty() ) {
-        TextBox box( title, Font::YELLOW_BIG, bsTextWidth );
-        box.Blit( windowRoi.x + bsTextXOffset, windowRoi.y + bsTextYOffset );
-        messageYOffset = bsTextIndent;
+        TextBox box( title, Font::YELLOW_BIG, ctx.scale( bsTextWidth ) );
+        box.Blit( ctx.scale( bsTextXOffset ), ctx.scale( bsTextYOffset ), ctx );
+        messageYOffset = ctx.scale( bsTextIndent );
     }
 
     if ( !msg.empty() ) {
-        TextBox box( msg, Font::BIG, bsTextWidth );
-        box.Blit( windowRoi.x + bsTextXOffset, windowRoi.y + bsTextYOffset + messageYOffset );
+        TextBox box( msg, Font::BIG, ctx.scale( bsTextWidth ) );
+        box.Blit( ctx.scale( bsTextXOffset ), ctx.scale( bsTextYOffset ) + messageYOffset, ctx );
     }
 
     // battlefield casualties
     Text text( _( "Battlefield Casualties" ), Font::SMALL );
-    text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 270 );
+    text.Blit( ( windowRoi.width - text.w() ) / 2, ctx.scale( 270 ), ctx );
 
     // attacker
     text.Set( _( "Attacker" ), Font::SMALL );
-    text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 285 );
+    text.Blit( ( windowRoi.width - text.w() ) / 2, ctx.scale( 285 ), ctx );
 
     if ( killed1.isValid() )
         Army::drawSingleDetailedMonsterLine( killed1, ctx, ctx.scale( 25 ), ctx.scale( 308 ), ctx.scale( 270 ) );
     else {
         text.Set( _( "None" ), Font::SMALL );
-        text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 300 );
+        text.Blit( ( windowRoi.width - text.w() ) / 2, ctx.scale( 300 ), ctx );
     }
 
     // defender
     text.Set( _( "Defender" ), Font::SMALL );
-    text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 345 );
+    text.Blit( ( windowRoi.width - text.w() ) / 2, ctx.scale( 345 ), ctx );
 
     if ( killed2.isValid() )
         Army::drawSingleDetailedMonsterLine( killed2, ctx, ctx.scale( 25 ), ctx.scale( 368 ), ctx.scale( 270 ) );
     else {
         text.Set( _( "None" ), Font::SMALL );
-        text.Blit( windowRoi.x + ( windowRoi.width - text.w() ) / 2, windowRoi.y + 360 );
+        text.Blit( ( windowRoi.width - text.w() ) / 2, ctx.scale( 360 ), ctx );
     }
 
     if ( allowToCancel ) {
