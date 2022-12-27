@@ -21,6 +21,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 namespace fheroes2
 {
@@ -43,6 +44,7 @@ namespace fheroes2
         uint32_t ASCIILastSupportedCharacter( const uint32_t fontType );
 
         int32_t GetAbsoluteICNHeight( int icnId );
+        void ScaleICNToDisplayFactor( std::vector<Sprite> & sprites );
 
         uint32_t getCharacterLimit( const FontSize fontSize );
         const Sprite & getChar( const uint8_t character, const FontType & fontType );

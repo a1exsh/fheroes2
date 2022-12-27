@@ -62,18 +62,11 @@ namespace fheroes2
             , _singleLayer( drawable_.singleLayer() )
         {}
 
-        Drawable( int32_t width_, int32_t height_ )
-            : _width( width_ )
-            , _height( height_ )
-            , _scaleFactor( 1 )
-            , _singleLayer( false )
-        {}
-
-        Drawable( int32_t width_, int32_t height_, int32_t scaleFactor_ )
+        Drawable( int32_t width_, int32_t height_, int32_t scaleFactor_ = 1, int32_t singleLayer_ = false )
             : _width( width_ )
             , _height( height_ )
             , _scaleFactor( scaleFactor_ )
-            , _singleLayer( false )
+            , _singleLayer( singleLayer_ )
         {}
 
         int32_t width() const override

@@ -445,8 +445,8 @@ namespace
         return fheroes2::isFontAvailable( translatedText, font ) ? translatedText : text;
     }
 
-    void renderTextOnButton( fheroes2::Image & releasedState, fheroes2::Image & pressedState, const char * text, const fheroes2::Point & releasedTextOffset,
-                             const fheroes2::Point & pressedTextOffset, const fheroes2::Size buttonSize, const fheroes2::FontColor fontColor )
+    void renderTextOnButton( fheroes2::Image & releasedState, fheroes2::Image & pressedState, const char * text, const fheroes2::Point releasedTextOffset,
+                             const fheroes2::Point pressedTextOffset, const fheroes2::Size buttonSize, const fheroes2::FontColor fontColor )
     {
         const fheroes2::FontType releasedFont{ fheroes2::FontSize::BUTTON_RELEASED, fontColor };
         const fheroes2::FontType pressedFont{ fheroes2::FontSize::BUTTON_PRESSED, fontColor };
@@ -622,6 +622,10 @@ namespace fheroes2
         {
             switch ( id ) {
             case ICN::BTNBATTLEONLY: {
+                // FIXME: no messing with the display's scale factor directly!
+                fheroes2::Display & display = fheroes2::Display::instance();
+                fheroes2::DisplayContext rootCtx = display.getContext();
+
                 _icnVsSprite[id].resize( 2 );
 
                 for ( int32_t i = 0; i < static_cast<int32_t>( _icnVsSprite[id].size() ); ++i ) {
@@ -629,12 +633,11 @@ namespace fheroes2
                     out = GetICN( ICN::BTNCOM, i );
 
                     // clean button.
-                    Fill( out, 13, 11, 113, 31, getButtonFillingColor( i == 0 ) );
+                    Fill( out, rootCtx.scale( 13 ), rootCtx.scale( 11 ), rootCtx.scale( 113 ), rootCtx.scale( 31 ), getButtonFillingColor( i == 0 ) );
                 }
 
-                renderTextOnButton( _icnVsSprite[id][0], _icnVsSprite[id][1], gettext_noop( "BATTLE\nONLY" ), { 12, 5 }, { 11, 6 }, { 117, 47 },
-                                    fheroes2::FontColor::WHITE );
-
+                renderTextOnButton( _icnVsSprite[id][0], _icnVsSprite[id][1], gettext_noop( "BATTLE\nONLY" ), rootCtx.point( { 12, 5 } ), rootCtx.point( { 11, 6 } ),
+                                    rootCtx.scale( { 117, 47 } ), fheroes2::FontColor::WHITE );
                 break;
             }
             case ICN::BUTTON_NEW_GAME_EVIL:
@@ -3323,8 +3326,7 @@ namespace fheroes2
             case ICN::BUTTON_GOOD_FONT_PRESSED:
             case ICN::BUTTON_EVIL_FONT_RELEASED:
             case ICN::BUTTON_EVIL_FONT_PRESSED: {
-                generateBaseButtonFont( _icnVsSprite[ICN::BUTTON_GOOD_FONT_RELEASED], _icnVsSprite[ICN::BUTTON_GOOD_FONT_PRESSED],
-                                        _icnVsSprite[ICN::BUTTON_EVIL_FONT_RELEASED], _icnVsSprite[ICN::BUTTON_EVIL_FONT_PRESSED] );
+                generateButtonAlphabet( fheroes2::getCurrentLanguage(), _icnVsSprite );
                 return true;
             }
             case ICN::HISCORE: {
@@ -3426,13 +3428,17 @@ namespace fheroes2
                 _icnVsSprite[id][0] = errorImage;
                 return;
             }
+            ScaleICNToDisplayFactor( _icnVsSprite[id] );
+        }
 
-            const int32_t imgScaleFactor = _icnVsSprite[id][0].scaleFactor();
+        void ScaleICNToDisplayFactor( std::vector<fheroes2::Sprite> & sprites )
+        {
+            const int32_t imgScaleFactor = sprites[0].scaleFactor();
             const int32_t displayScaleFactor = Display::instance().scaleFactor();
 
             if ( imgScaleFactor != displayScaleFactor ) {
-                for ( size_t i = 0; i < _icnVsSprite[id].size(); ++i ) {
-                    const Sprite & original = _icnVsSprite[id][i];
+                for ( size_t i = 0; i < sprites.size(); ++i ) {
+                    const Sprite & original = sprites[i];
 
                     // resize the image to match the display's scale factor
                     Sprite scaled( original.width() * displayScaleFactor / imgScaleFactor, original.height() * displayScaleFactor / imgScaleFactor,
@@ -3444,7 +3450,7 @@ namespace fheroes2
 
                     const bool subpixel = imgScaleFactor > displayScaleFactor;
                     Resize( original, scaled, subpixel );
-                    _icnVsSprite[id][i] = scaled;
+                    sprites[i] = scaled;
                 }
             }
         }

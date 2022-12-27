@@ -30,6 +30,7 @@
 #include "agg_image.h"
 #include "image.h"
 #include "math_base.h"
+#include "screen.h"
 
 namespace
 {
@@ -60,15 +61,18 @@ namespace
 
     int32_t getSpaceCharWidth( const fheroes2::FontSize fontSize )
     {
+        // FIXME: no messing with the display's scale factor directly!
+        fheroes2::Display & display = fheroes2::Display::instance();
+
         switch ( fontSize ) {
         case fheroes2::FontSize::SMALL:
-            return 4;
+            return 4 * display.scaleFactor();
         case fheroes2::FontSize::NORMAL:
-            return 6;
+            return 6 * display.scaleFactor();
         case fheroes2::FontSize::LARGE:
         case fheroes2::FontSize::BUTTON_RELEASED:
         case fheroes2::FontSize::BUTTON_PRESSED:
-            return 8;
+            return 8 * display.scaleFactor();
         default:
             assert( 0 ); // Did you add a new font size? Please add implementation.
         }
@@ -78,16 +82,19 @@ namespace
 
     int32_t getFontHeight( const fheroes2::FontSize fontSize )
     {
+        // FIXME: no messing with the display's scale factor directly!
+        fheroes2::Display & display = fheroes2::Display::instance();
+
         switch ( fontSize ) {
         case fheroes2::FontSize::SMALL:
-            return 8 + 2 + 1;
+            return ( 8 + 2 + 1 ) * display.scaleFactor();
         case fheroes2::FontSize::NORMAL:
-            return 13 + 3 + 1;
+            return ( 13 + 3 + 1 ) * display.scaleFactor();
         case fheroes2::FontSize::LARGE:
-            return 26 + 6 + 1;
+            return ( 26 + 6 + 1 ) * display.scaleFactor();
         case fheroes2::FontSize::BUTTON_RELEASED:
         case fheroes2::FontSize::BUTTON_PRESSED:
-            return 16;
+            return 16 * display.scaleFactor();
         default:
             assert( 0 ); // Did you add a new font size? Please add implementation.
         }

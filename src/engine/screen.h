@@ -223,39 +223,15 @@ namespace fheroes2
         void _renderFrame( const Rect & roi ) const; // prepare and render a frame
     };
 
-    class DisplayContext : public AbstractDisplay
+    class DisplayContext : public AbstractDisplay, public Drawable
     {
     public:
         DisplayContext( Display & display, int32_t x, int32_t y )
-            : _display( display )
+            : Drawable( display.width(), display.height(), display.scaleFactor(), /* singleLayer = */ true )
+            , _display( display )
             , _x( std::max( 0, std::min( x, display.width() - 1 ) ) )
             , _y( std::max( 0, std::min( y, display.height() - 1 ) ) )
         {}
-
-        int32_t width() const override
-        {
-            return _display.width();
-        }
-
-        int32_t height() const override
-        {
-            return _display.height();
-        }
-
-        int32_t scaleFactor() const override
-        {
-            return _display.scaleFactor();
-        }
-
-        bool singleLayer() const override
-        {
-            return _display.singleLayer(); // actually should be always true
-        }
-
-        bool empty() const override
-        {
-            return _display.empty();
-        }
 
         uint8_t * image() override
         {
@@ -300,7 +276,7 @@ namespace fheroes2
 
         int32_t scale( int32_t xy ) const
         {
-            return xy * _display.scaleFactor();
+            return xy * _scaleFactor;
         }
 
         int32_t translateX( int32_t x ) const
@@ -311,6 +287,21 @@ namespace fheroes2
         int32_t translateY( int32_t y ) const
         {
             return _y + y;
+        }
+
+        Point translate( const Point & p ) const
+        {
+            return { translateX( p.x ), translateY( p.y ) };
+        }
+
+        Size scale( const Size & s ) const
+        {
+            return { scale( s.width ), scale( s.height ) };
+        }
+
+        Point point( const Point & p ) const
+        {
+            return { coordX( p.x ), coordY( p.y ) };
         }
 
         Rect area( const Rect & r ) const
