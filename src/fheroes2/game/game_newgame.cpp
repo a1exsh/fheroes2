@@ -527,7 +527,7 @@ fheroes2::GameMode Game::NewGame()
     fheroes2::Display & display = fheroes2::Display::instance();
     fheroes2::DisplayContext ctx = display.getContext( buttonPos.x, buttonPos.y );
 
-    fheroes2::Button buttonStandartGame( 0, 0, ICN::BUTTON_STANDARD_GAME, 0, 1 );
+    fheroes2::Button buttonStandardGame( 0, 0, ICN::BUTTON_STANDARD_GAME, 0, 1 );
     fheroes2::ButtonSprite buttonCampainGame( 0, ctx.scale( buttonYStep ), fheroes2::AGG::GetICN( ICN::BUTTON_CAMPAIGN_GAME, 0 ),
                                               fheroes2::AGG::GetICN( ICN::BUTTON_CAMPAIGN_GAME, 1 ), fheroes2::AGG::GetICN( ICN::NEW_CAMPAIGN_DISABLED_BUTTON, 0 ) );
     fheroes2::Button buttonMultiGame( 0, ctx.scale( buttonYStep * 2 ), ICN::BUTTON_MULTIPLAYER_GAME, 0, 1 );
@@ -539,7 +539,7 @@ fheroes2::GameMode Game::NewGame()
         buttonCampainGame.disable();
     }
 
-    buttonStandartGame.draw( ctx );
+    buttonStandardGame.draw( ctx );
     buttonCampainGame.draw( ctx );
     buttonMultiGame.draw( ctx );
     buttonBattleGame.draw( ctx );
@@ -551,7 +551,7 @@ fheroes2::GameMode Game::NewGame()
     LocalEvent & le = LocalEvent::Get();
 
     while ( le.HandleEvents() ) {
-        le.MousePressLeft( buttonStandartGame.area( ctx ) ) ? buttonStandartGame.drawOnPress( ctx ) : buttonStandartGame.drawOnRelease( ctx );
+        le.MousePressLeft( buttonStandardGame.area( ctx ) ) ? buttonStandardGame.drawOnPress( ctx ) : buttonStandardGame.drawOnRelease( ctx );
 
         if ( buttonCampainGame.isEnabled() ) {
             le.MousePressLeft( buttonCampainGame.area( ctx ) ) ? buttonCampainGame.drawOnPress( ctx ) : buttonCampainGame.drawOnRelease( ctx );
@@ -561,7 +561,7 @@ fheroes2::GameMode Game::NewGame()
         le.MousePressLeft( buttonSettings.area( ctx ) ) ? buttonSettings.drawOnPress( ctx ) : buttonSettings.drawOnRelease( ctx );
         le.MousePressLeft( buttonCancelGame.area( ctx ) ) ? buttonCancelGame.drawOnPress( ctx ) : buttonCancelGame.drawOnRelease( ctx );
 
-        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_STANDARD ) || le.MouseClickLeft( buttonStandartGame.area( ctx ) ) )
+        if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_STANDARD ) || le.MouseClickLeft( buttonStandardGame.area( ctx ) ) )
             return fheroes2::GameMode::NEW_STANDARD;
         if ( buttonCampainGame.isEnabled() && ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_CAMPAIGN ) || le.MouseClickLeft( buttonCampainGame.area( ctx ) ) ) )
             return fheroes2::GameMode::NEW_CAMPAIGN_SELECTION;
@@ -577,7 +577,7 @@ fheroes2::GameMode Game::NewGame()
         if ( HotKeyPressEvent( HotKeyEvent::MAIN_MENU_BATTLEONLY ) || le.MouseClickLeft( buttonBattleGame.area( ctx ) ) )
             return fheroes2::GameMode::NEW_BATTLE_ONLY;
 
-        if ( le.MousePressRight( buttonStandartGame.area( ctx ) ) )
+        if ( le.MousePressRight( buttonStandardGame.area( ctx ) ) )
             Dialog::Message( _( "Standard Game" ), _( "A single player game playing out a single map." ), Font::BIG );
         else if ( le.MousePressRight( buttonCampainGame.area( ctx ) ) )
             Dialog::Message( _( "Campaign Game" ), _( "A single player game playing through a series of maps." ), Font::BIG );
