@@ -70,9 +70,9 @@ namespace Battle
         void StartBattle();
 
     private:
-        void RedrawBaseInfo( const fheroes2::Point & top ) const;
+        void RedrawBaseInfo( fheroes2::DisplayContext & ctx ) const;
 
-        void UpdateHero1( const fheroes2::Point & cur_pt );
+        void UpdateHero1( const fheroes2::Point & cur_pt, fheroes2::DisplayContext & ctx );
         void UpdateHero2( const fheroes2::Point & cur_pt );
 
         Heroes * hero1;

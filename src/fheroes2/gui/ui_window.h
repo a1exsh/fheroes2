@@ -32,8 +32,8 @@ namespace fheroes2
     class StandardWindow
     {
     public:
-        StandardWindow( const int32_t width, const int32_t height, Image & output = Display::instance() );
-        StandardWindow( const int32_t x, const int32_t y, const int32_t width, const int32_t height, Image & output = Display::instance() );
+        StandardWindow( const int32_t width, const int32_t height, DisplayContext ctx = Display::instance().getContext() );
+        StandardWindow( const int32_t x, const int32_t y, const int32_t width, const int32_t height, DisplayContext ctx = Display::instance().getContext() );
 
         const Rect & activeArea() const
         {
@@ -45,12 +45,18 @@ namespace fheroes2
             return _windowArea;
         }
 
-        void render();
+        void redraw();
 
     private:
-        Image & _output;
+        void renderShadow();
+        Image stretchBackground();
+
+        DisplayContext _ctx;
         const Rect _activeArea;
+        const int32_t _borderSize;
         const Rect _windowArea;
-        ImageRestorer _restorer;
+        const int32_t _shadowSize;
+        const ImageRestorer _restorer;
+        const Image _background;
     };
 }

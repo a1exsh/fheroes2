@@ -631,7 +631,7 @@ namespace fheroes2
         _y = y_;
     }
 
-    ImageRestorer::ImageRestorer( Image & image )
+    ImageRestorer::ImageRestorer( AbstractDrawable & image )
         : _image( image )
         , _x( 0 )
         , _y( 0 )
@@ -648,7 +648,7 @@ namespace fheroes2
         Copy( _image, _x, _y, _copy, 0, 0, _width, _height );
     }
 
-    ImageRestorer::ImageRestorer( Image & image, int32_t x_, int32_t y_, int32_t width, int32_t height )
+    ImageRestorer::ImageRestorer( AbstractDrawable & image, int32_t x_, int32_t y_, int32_t width, int32_t height )
         : _image( image )
         , _x( x_ )
         , _y( y_ )
@@ -940,7 +940,7 @@ namespace fheroes2
         ApplyPalette( in, inX, inY, out, outX, outY, width, height, palette );
     }
 
-    void ApplyTransform( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId )
+    void ApplyTransform( AbstractDrawable & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId )
     {
         if ( !Verify( image, x, y, width, height ) )
             return;
@@ -1658,15 +1658,18 @@ namespace fheroes2
         return out;
     }
 
-    void Fill( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t colorId )
+    void Fill( AbstractDrawable & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t colorId )
     {
         if ( !Verify( image, x, y, width, height ) )
             return;
 
+        // FIXME: reinstate this optimization
+        /*
         if ( image.width() == width && image.height() == height ) { // we need to fill whole image
             image.fill( colorId );
             return;
         }
+        */
 
         const int32_t imageWidth = image.width();
 

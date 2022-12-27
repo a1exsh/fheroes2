@@ -111,33 +111,36 @@ bool Battle::Only::ChangeSettings()
     // setup cursor
     const CursorRestorer cursorRestorer( true, Cursor::POINTER );
 
-    const fheroes2::StandardWindow frameborder( fheroes2::Display::DEFAULT_WIDTH, fheroes2::Display::DEFAULT_HEIGHT );
+    const fheroes2::Sprite & winImage = fheroes2::AGG::GetICN( ICN::SWAPWIN, 0 );
+    const fheroes2::StandardWindow frameborder( winImage.width(), winImage.height() );
 
     const fheroes2::Point cur_pt( frameborder.activeArea().x, frameborder.activeArea().y );
+    fheroes2::DisplayContext ctx = display.getContext( cur_pt.x, cur_pt.y );
 
-    rtPortrait1 = fheroes2::Rect( cur_pt.x + 93, cur_pt.y + 72, 101, 93 );
-    rtPortrait2 = fheroes2::Rect( cur_pt.x + 445, cur_pt.y + 72, 101, 93 );
+    // FIXME: it's confusing when to scale, when to translate and when to do both
+    rtPortrait1 = ctx.scale( { 93, 72, 101, 93 } );
+    rtPortrait2 = ctx.scale( { 445, 72, 101, 93 } );
 
-    const fheroes2::Rect rtAttack1( cur_pt.x + 215, cur_pt.y + 50, 33, 33 );
-    const fheroes2::Rect rtAttack2( cur_pt.x + 390, cur_pt.y + 50, 33, 33 );
+    const fheroes2::Rect rtAttack1 = ctx.area( { 215, 50, 33, 33 } );
+    const fheroes2::Rect rtAttack2 = ctx.area( { 390, 50, 33, 33 } );
 
-    const fheroes2::Rect rtDefense1( cur_pt.x + 215, cur_pt.y + 83, 33, 33 );
-    const fheroes2::Rect rtDefense2( cur_pt.x + 390, cur_pt.y + 83, 33, 33 );
+    const fheroes2::Rect rtDefense1 = ctx.area( { 215, 83, 33, 33 } );
+    const fheroes2::Rect rtDefense2 = ctx.area( { 390, 83, 33, 33 } );
 
-    const fheroes2::Rect rtPower1( cur_pt.x + 215, cur_pt.y + 116, 33, 33 );
-    const fheroes2::Rect rtPower2( cur_pt.x + 390, cur_pt.y + 116, 33, 33 );
+    const fheroes2::Rect rtPower1 = ctx.area( { 215, 116, 33, 33 } );
+    const fheroes2::Rect rtPower2 = ctx.area( { 390, 116, 33, 33 } );
 
-    const fheroes2::Rect rtKnowledge1( cur_pt.x + 215, cur_pt.y + 149, 33, 33 );
-    const fheroes2::Rect rtKnowledge2( cur_pt.x + 390, cur_pt.y + 149, 33, 33 );
+    const fheroes2::Rect rtKnowledge1 = ctx.area( { 215, 149, 33, 33 } );
+    const fheroes2::Rect rtKnowledge2 = ctx.area( { 390, 149, 33, 33 } );
 
     hero1 = world.GetHeroes( Heroes::LORDKILBURN );
     hero1->GetSecondarySkills().FillMax( Skill::Secondary() );
 
     army1 = &hero1->GetArmy();
 
-    RedrawBaseInfo( cur_pt );
+    RedrawBaseInfo( ctx );
 
-    UpdateHero1( cur_pt );
+    UpdateHero1( cur_pt, ctx );
 
     moraleIndicator1->Redraw();
     luckIndicator1->Redraw();
@@ -178,29 +181,31 @@ bool Battle::Only::ChangeSettings()
     bool allow2 = true;
 
     // hide the shadow from the original EXIT button
-    const fheroes2::Sprite buttonOverride = fheroes2::Crop( fheroes2::AGG::GetICN( ICN::SWAPWIN, 0 ), 122, 428, 84, 32 );
-    fheroes2::Blit( buttonOverride, display, cur_pt.x + 276, cur_pt.y + 428 );
+    // FIXME: actually, here it's the image scale factor that should be used, not the one from the context
+    const fheroes2::Sprite buttonOverride
+        = fheroes2::Crop( fheroes2::AGG::GetICN( ICN::SWAPWIN, 0 ), ctx.scale( 122 ), ctx.scale( 428 ), ctx.scale( 84 ), ctx.scale( 32 ) );
+    fheroes2::Blit( buttonOverride, ctx, ctx.scale( 276 ), ctx.scale( 428 ) );
 
     const int icnId = ICN::BUTTON_SMALL_OKAY_GOOD;
     const fheroes2::Sprite & buttonStartImage = fheroes2::AGG::GetICN( icnId, 0 );
-    fheroes2::ButtonSprite buttonStart = fheroes2::makeButtonWithShadow( cur_pt.x + ( 640 - buttonStartImage.width() ) / 2, cur_pt.y + 428, buttonStartImage,
+    fheroes2::ButtonSprite buttonStart = fheroes2::makeButtonWithShadow( ( ctx.scale( 640 ) - buttonStartImage.width() ) / 2, ctx.scale( 428 ), buttonStartImage,
                                                                          fheroes2::AGG::GetICN( icnId, 1 ), display );
-    buttonStart.draw();
+    buttonStart.draw( ctx );
 
     display.render();
 
     // message loop
     while ( !exit && le.HandleEvents() ) {
-        buttonStart.isEnabled() && le.MousePressLeft( buttonStart.area() ) ? buttonStart.drawOnPress() : buttonStart.drawOnRelease();
+        buttonStart.isEnabled() && le.MousePressLeft( buttonStart.area( ctx ) ) ? buttonStart.drawOnPress( ctx ) : buttonStart.drawOnRelease( ctx );
 
-        if ( ( buttonStart.isEnabled() && le.MouseClickLeft( buttonStart.area() ) ) || Game::HotKeyPressEvent( Game::HotKeyEvent::DEFAULT_OKAY ) ) {
+        if ( ( buttonStart.isEnabled() && le.MouseClickLeft( buttonStart.area( ctx ) ) ) || Game::HotKeyPressEvent( Game::HotKeyEvent::DEFAULT_OKAY ) ) {
             result = true;
             exit = true;
         }
         else if ( Game::HotKeyPressEvent( Game::HotKeyEvent::DEFAULT_CANCEL ) )
             exit = true;
 
-        if ( allow1 && le.MouseClickLeft( rtPortrait1 ) ) {
+        if ( allow1 && le.MouseClickLeft( ctx.translate( rtPortrait1 ) ) ) { // meh
             int hid = Dialog::SelectHeroes( hero1 ? hero1->GetID() : Heroes::UNKNOWN );
             if ( hero2 && hid == hero2->GetID() ) {
                 Dialog::Message( _( "Error" ), _( "Please select another hero." ), Font::BIG, Dialog::OK );
@@ -209,11 +214,11 @@ bool Battle::Only::ChangeSettings()
                 hero1 = world.GetHeroes( hid );
                 if ( hero1 )
                     hero1->GetSecondarySkills().FillMax( Skill::Secondary() );
-                UpdateHero1( cur_pt );
+                UpdateHero1( cur_pt, ctx );
                 redraw = true;
             }
         }
-        else if ( allow2 && le.MouseClickLeft( rtPortrait2 ) ) {
+        else if ( allow2 && le.MouseClickLeft( ctx.translate( rtPortrait2 ) ) ) { // meh
             int hid = Dialog::SelectHeroes( hero2 ? hero2->GetID() : Heroes::UNKNOWN );
             if ( hero1 && hid == hero1->GetID() ) {
                 Dialog::Message( _( "Error" ), _( "Please select another hero." ), Font::BIG, Dialog::OK );
@@ -381,7 +386,7 @@ bool Battle::Only::ChangeSettings()
             continue;
         }
 
-        RedrawBaseInfo( cur_pt );
+        RedrawBaseInfo( ctx );
         moraleIndicator1->Redraw();
         luckIndicator1->Redraw();
         secskill_bar1->Redraw( display );
@@ -401,7 +406,7 @@ bool Battle::Only::ChangeSettings()
             cinfo2->Redraw();
         }
 
-        buttonStart.draw();
+        buttonStart.draw( ctx );
         display.render();
 
         redraw = false;
@@ -426,7 +431,7 @@ bool Battle::Only::ChangeSettings()
     return result;
 }
 
-void Battle::Only::UpdateHero1( const fheroes2::Point & cur_pt )
+void Battle::Only::UpdateHero1( const fheroes2::Point & cur_pt, fheroes2::DisplayContext & ctx )
 {
     primskill_bar1.reset();
     secskill_bar1.reset();
@@ -438,16 +443,16 @@ void Battle::Only::UpdateHero1( const fheroes2::Point & cur_pt )
         player1.SetRace( hero1->GetRace() );
 
         if ( moraleIndicator1 == nullptr ) {
-            moraleIndicator1.reset( new MoraleIndicator( hero1 ) );
-            moraleIndicator1->SetPos( { cur_pt.x + 34, cur_pt.y + 75 } );
+            moraleIndicator1.reset( new MoraleIndicator( hero1, ctx ) );
+            moraleIndicator1->SetPos( { 34, 75 } );
         }
         else {
             moraleIndicator1->SetHero( hero1 );
         }
 
         if ( luckIndicator1 == nullptr ) {
-            luckIndicator1.reset( new LuckIndicator( hero1 ) );
-            luckIndicator1->SetPos( { cur_pt.x + 34, cur_pt.y + 115 } );
+            luckIndicator1.reset( new LuckIndicator( hero1, ctx ) );
+            luckIndicator1->SetPos( { 34, 115 } );
         }
         else {
             luckIndicator1->SetHero( hero1 );
@@ -534,11 +539,9 @@ void Battle::Only::UpdateHero2( const fheroes2::Point & cur_pt )
     }
 }
 
-void Battle::Only::RedrawBaseInfo( const fheroes2::Point & top ) const
+void Battle::Only::RedrawBaseInfo( fheroes2::DisplayContext & ctx ) const
 {
-    fheroes2::Display & display = fheroes2::Display::instance();
-
-    fheroes2::Blit( fheroes2::AGG::GetICN( ICN::SWAPWIN, 0 ), display, top.x, top.y );
+    fheroes2::Blit( fheroes2::AGG::GetICN( ICN::SWAPWIN, 0 ), ctx );
 
     // header
     std::string message = _( "%{race1} %{name1}" );
@@ -563,33 +566,33 @@ void Battle::Only::RedrawBaseInfo( const fheroes2::Point & top ) const
     }
 
     fheroes2::Text text( message, fheroes2::FontType::normalWhite() );
-    text.draw( top.x + 320 - text.width() / 2, top.y + 29, display );
+    text.draw( ctx.scale( 320 ) - text.width() / 2, ctx.scale( 29 ), ctx );
 
     // portrait
     if ( hero1 ) {
         const fheroes2::Sprite & port1 = hero1->GetPortrait( PORT_BIG );
         if ( !port1.empty() )
-            fheroes2::Blit( port1, display, rtPortrait1.x, rtPortrait1.y );
+            fheroes2::Blit( port1, ctx, rtPortrait1.x, rtPortrait1.y );
     }
     else {
-        fheroes2::Fill( display, rtPortrait1.x, rtPortrait1.y, rtPortrait1.width, rtPortrait1.height, 0 );
+        fheroes2::Fill( ctx, rtPortrait1.x, rtPortrait1.y, rtPortrait1.width, rtPortrait1.height, 0 );
         text.set( _( "N/A" ), fheroes2::FontType::normalWhite() );
-        text.draw( rtPortrait1.x + ( rtPortrait1.width - text.width() ) / 2, rtPortrait1.y + rtPortrait1.height / 2 - 8, display );
+        text.draw( rtPortrait1.x + ( rtPortrait1.width - text.width() ) / 2, rtPortrait1.y + rtPortrait1.height / 2 - 8, ctx );
     }
 
     if ( hero2 ) {
         const fheroes2::Sprite & port2 = hero2->GetPortrait( PORT_BIG );
         if ( !port2.empty() )
-            fheroes2::Blit( port2, display, rtPortrait2.x, rtPortrait2.y );
+            fheroes2::Blit( port2, ctx, rtPortrait2.x, rtPortrait2.y );
     }
     else {
-        fheroes2::Fill( display, rtPortrait2.x, rtPortrait2.y, rtPortrait2.width, rtPortrait2.height, 0 );
+        fheroes2::Fill( ctx, rtPortrait2.x, rtPortrait2.y, rtPortrait2.width, rtPortrait2.height, 0 );
         text.set( _( "N/A" ), fheroes2::FontType::normalWhite() );
-        text.draw( rtPortrait2.x + ( rtPortrait2.width - text.width() ) / 2, rtPortrait2.y + rtPortrait2.height / 2 - 8, display );
+        text.draw( rtPortrait2.x + ( rtPortrait2.width - text.width() ) / 2, rtPortrait2.y + rtPortrait2.height / 2 - 8, ctx );
     }
 
     // primary skill
-    fheroes2::RedrawPrimarySkillInfo( top, primskill_bar1.get(), primskill_bar2.get() );
+    fheroes2::RedrawPrimarySkillInfo( ctx.point( { 0, 0 } ) /* FIXME: pass context instead */, primskill_bar1.get(), primskill_bar2.get() );
 }
 
 void Battle::Only::StartBattle()

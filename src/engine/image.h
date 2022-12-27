@@ -189,8 +189,8 @@ namespace fheroes2
     class ImageRestorer
     {
     public:
-        explicit ImageRestorer( Image & image );
-        ImageRestorer( Image & image, int32_t x_, int32_t y_, int32_t width, int32_t height );
+        explicit ImageRestorer( AbstractDrawable & image );
+        ImageRestorer( AbstractDrawable & image, int32_t x_, int32_t y_, int32_t width, int32_t height );
         ~ImageRestorer(); // restore method will be call upon object's destruction
 
         ImageRestorer( const ImageRestorer & ) = delete;
@@ -226,7 +226,7 @@ namespace fheroes2
         void reset();
 
     private:
-        Image & _image;
+        AbstractDrawable & _image;
         Image _copy;
 
         int32_t _x;
@@ -263,7 +263,7 @@ namespace fheroes2
     void ApplyAlpha( const Image & in, Image & out, uint8_t alpha );
     void ApplyAlpha( const Image & in, int32_t inX, int32_t inY, Image & out, int32_t outX, int32_t outY, int32_t width, int32_t height, uint8_t alpha );
 
-    void ApplyTransform( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId );
+    void ApplyTransform( AbstractDrawable & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t transformId );
 
     // draw one image onto another
     void Blit( const Sprite & in, AbstractDrawable & out, bool flip = false );
@@ -302,7 +302,7 @@ namespace fheroes2
     Image ExtractCommonPattern( const std::vector<const Image *> & input );
 
     // Please use GetColorId function if you want to use an RGB value
-    void Fill( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t colorId );
+    void Fill( AbstractDrawable & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t colorId );
 
     void FillTransform( Image & image, int32_t x, int32_t y, int32_t width, int32_t height, uint8_t tranformId );
 

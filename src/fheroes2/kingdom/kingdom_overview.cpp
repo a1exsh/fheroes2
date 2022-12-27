@@ -826,7 +826,7 @@ void Kingdom::openOverviewDialog()
             // redraw the main game window on screen, which will also erase current kingdom window
             Interface::Basic::Get().Redraw();
             // redraw Kingdom window from scratch, because it's now invalid
-            background.render();
+            background.redraw();
             fheroes2::Blit( fheroes2::AGG::GetICN( ICN::OVERBACK, 0 ), display, cur_pt.x, cur_pt.y );
             buttonHeroes.draw();
             buttonCastle.draw();

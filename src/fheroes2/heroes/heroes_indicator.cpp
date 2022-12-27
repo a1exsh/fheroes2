@@ -59,9 +59,10 @@ namespace fheroes2
     }
 }
 
-HeroesIndicator::HeroesIndicator( const Heroes * h )
+HeroesIndicator::HeroesIndicator( const Heroes * h, fheroes2::DisplayContext c )
     : hero( h )
-    , back( fheroes2::Display::instance() )
+    , ctx( c )
+    , back( ctx )
 {
     descriptions.reserve( 256 );
 }
@@ -78,17 +79,17 @@ void HeroesIndicator::SetHero( const Heroes * h )
 
 void HeroesIndicator::SetPos( const fheroes2::Point & pt )
 {
-    area.x = pt.x;
-    area.y = pt.y;
+    area.x = ctx.scale( pt.x );
+    area.y = ctx.scale( pt.y );
     back.update( area.x, area.y, area.width, area.height );
 }
 
-LuckIndicator::LuckIndicator( const Heroes * h )
-    : HeroesIndicator( h )
+LuckIndicator::LuckIndicator( const Heroes * h, fheroes2::DisplayContext c )
+    : HeroesIndicator( h, c )
     , luck( Luck::NORMAL )
 {
-    area.width = 35;
-    area.height = 26;
+    area.width = ctx.scale( 35 );
+    area.height = ctx.scale( 26 );
 }
 
 void LuckIndicator::Redraw()
@@ -107,7 +108,7 @@ void LuckIndicator::Redraw()
     descriptions.append( "\n \n" );
 
     const fheroes2::Sprite & sprite = fheroes2::AGG::GetICN( ICN::HSICONS, ( 0 > luck ? 3 : ( 0 < luck ? 2 : 6 ) ) );
-    const int inter = 6;
+    const int inter = ctx.scale( 6 );
     int count = ( 0 == luck ? 1 : std::abs( luck ) );
     int32_t cx = area.x + ( area.width - ( sprite.width() + inter * ( count - 1 ) ) ) / 2;
     int32_t cy = area.y + ( area.height - sprite.height() ) / 2;
@@ -119,7 +120,7 @@ void LuckIndicator::Redraw()
 
     back.restore();
     while ( count-- ) {
-        fheroes2::Blit( sprite, fheroes2::Display::instance(), cx, cy );
+        fheroes2::Blit( sprite, ctx, cx, cy );
         cx += inter;
     }
 }
@@ -134,12 +135,12 @@ void LuckIndicator::QueueEventProcessing( const LuckIndicator & indicator )
         Dialog::Message( fheroes2::LuckString( indicator.luck ), indicator.descriptions, Font::BIG );
 }
 
-MoraleIndicator::MoraleIndicator( const Heroes * h )
-    : HeroesIndicator( h )
+MoraleIndicator::MoraleIndicator( const Heroes * h, fheroes2::DisplayContext c )
+    : HeroesIndicator( h, c )
     , morale( Morale::NORMAL )
 {
-    area.width = 35;
-    area.height = 26;
+    area.width = ctx.scale( 35 );
+    area.height = ctx.scale( 26 );
 }
 
 void MoraleIndicator::Redraw()
@@ -168,14 +169,14 @@ void MoraleIndicator::Redraw()
     }
 
     const fheroes2::Sprite & sprite = fheroes2::AGG::GetICN( ICN::HSICONS, ( 0 > morale ? 5 : ( 0 < morale ? 4 : 7 ) ) );
-    const int inter = 6;
+    const int inter = ctx.scale( 6 );
     int count = ( 0 == morale ? 1 : std::abs( morale ) );
     int32_t cx = area.x + ( area.width - ( sprite.width() + inter * ( count - 1 ) ) ) / 2;
     int32_t cy = area.y + ( area.height - sprite.height() ) / 2;
 
     back.restore();
     while ( count-- ) {
-        fheroes2::Blit( sprite, fheroes2::Display::instance(), cx, cy );
+        fheroes2::Blit( sprite, ctx, cx, cy );
         cx += inter;
     }
 }
@@ -190,11 +191,11 @@ void MoraleIndicator::QueueEventProcessing( const MoraleIndicator & indicator )
         Dialog::Message( fheroes2::MoraleString( indicator.morale ), indicator.descriptions, Font::BIG );
 }
 
-ExperienceIndicator::ExperienceIndicator( const Heroes * h )
-    : HeroesIndicator( h )
+ExperienceIndicator::ExperienceIndicator( const Heroes * h, fheroes2::DisplayContext c )
+    : HeroesIndicator( h, c )
 {
-    area.width = 35;
-    area.height = 36;
+    area.width = ctx.scale( 35 );
+    area.height = ctx.scale( 36 );
 
     descriptions = _( "Current experience %{exp1}.\n Next level %{exp2}." );
     if ( hero ) {
@@ -204,16 +205,16 @@ ExperienceIndicator::ExperienceIndicator( const Heroes * h )
     }
 }
 
-void ExperienceIndicator::Redraw() const
+void ExperienceIndicator::Redraw()
 {
     if ( !hero )
         return;
 
     const fheroes2::Sprite & sprite3 = fheroes2::AGG::GetICN( ICN::HSICONS, 1 );
-    fheroes2::Blit( sprite3, fheroes2::Display::instance(), area.x, area.y );
+    fheroes2::Blit( sprite3, ctx, area.x, area.y );
 
     Text text( std::to_string( hero->GetExperience() ), Font::SMALL );
-    text.Blit( area.x + 17 - text.w() / 2, area.y + 23 );
+    text.Blit( area.x + ctx.scale( 17 ) - text.w() / 2, area.y + ctx.scale( 23 ) );
 }
 
 void ExperienceIndicator::QueueEventProcessing() const
@@ -227,11 +228,11 @@ void ExperienceIndicator::QueueEventProcessing() const
     }
 }
 
-SpellPointsIndicator::SpellPointsIndicator( const Heroes * h )
-    : HeroesIndicator( h )
+SpellPointsIndicator::SpellPointsIndicator( const Heroes * h, fheroes2::DisplayContext c )
+    : HeroesIndicator( h, c )
 {
-    area.width = 35;
-    area.height = 36;
+    area.width = ctx.scale( 35 );
+    area.height = ctx.scale( 36 );
 
     descriptions = _(
         "%{name} currently has %{point} spell points out of a maximum of %{max}. The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events." );
@@ -242,16 +243,16 @@ SpellPointsIndicator::SpellPointsIndicator( const Heroes * h )
     }
 }
 
-void SpellPointsIndicator::Redraw() const
+void SpellPointsIndicator::Redraw()
 {
     if ( !hero )
         return;
 
     const fheroes2::Sprite & sprite3 = fheroes2::AGG::GetICN( ICN::HSICONS, 8 );
-    fheroes2::Blit( sprite3, fheroes2::Display::instance(), area.x, area.y );
+    fheroes2::Blit( sprite3, ctx, area.x, area.y );
 
     Text text( std::to_string( hero->GetSpellPoints() ) + "/" + std::to_string( hero->GetMaxSpellPoints() ), Font::SMALL );
-    text.Blit( area.x + sprite3.width() / 2 - text.w() / 2, area.y + 21 );
+    text.Blit( area.x + sprite3.width() / 2 - text.w() / 2, area.y + ctx.scale( 21 ) );
 }
 
 void SpellPointsIndicator::QueueEventProcessing() const

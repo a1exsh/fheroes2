@@ -28,6 +28,7 @@
 
 #include "image.h"
 #include "math_base.h"
+#include "screen.h"
 
 namespace fheroes2
 {
@@ -40,7 +41,7 @@ class Heroes;
 class HeroesIndicator
 {
 public:
-    explicit HeroesIndicator( const Heroes * h = nullptr );
+    explicit HeroesIndicator( const Heroes * h = nullptr, fheroes2::DisplayContext c = fheroes2::Display::instance().getContext() );
 
     const fheroes2::Rect & GetArea() const;
     void SetPos( const fheroes2::Point & );
@@ -48,6 +49,7 @@ public:
 
 protected:
     const Heroes * hero;
+    fheroes2::DisplayContext ctx;
     fheroes2::Rect area;
     fheroes2::ImageRestorer back;
     std::string descriptions;
@@ -56,7 +58,7 @@ protected:
 class LuckIndicator : public HeroesIndicator
 {
 public:
-    explicit LuckIndicator( const Heroes * h = nullptr );
+    explicit LuckIndicator( const Heroes * h = nullptr, fheroes2::DisplayContext c = fheroes2::Display::instance().getContext() );
 
     void Redraw();
     static void QueueEventProcessing( const LuckIndicator & );
@@ -68,7 +70,7 @@ private:
 class MoraleIndicator : public HeroesIndicator
 {
 public:
-    explicit MoraleIndicator( const Heroes * h = nullptr );
+    explicit MoraleIndicator( const Heroes * h = nullptr, fheroes2::DisplayContext c = fheroes2::Display::instance().getContext() );
 
     void Redraw();
     static void QueueEventProcessing( const MoraleIndicator & );
@@ -80,18 +82,18 @@ private:
 class ExperienceIndicator : public HeroesIndicator
 {
 public:
-    explicit ExperienceIndicator( const Heroes * h = nullptr );
+    explicit ExperienceIndicator( const Heroes * h = nullptr, fheroes2::DisplayContext c = fheroes2::Display::instance().getContext() );
 
-    void Redraw() const;
+    void Redraw();
     void QueueEventProcessing() const;
 };
 
 class SpellPointsIndicator : public HeroesIndicator
 {
 public:
-    explicit SpellPointsIndicator( const Heroes * h = nullptr );
+    explicit SpellPointsIndicator( const Heroes * h = nullptr, fheroes2::DisplayContext c = fheroes2::Display::instance().getContext() );
 
-    void Redraw() const;
+    void Redraw();
     void QueueEventProcessing() const;
 };
 
