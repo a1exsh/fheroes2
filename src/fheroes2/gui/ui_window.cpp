@@ -41,7 +41,7 @@ namespace fheroes2
         , _borderSize( _ctx.scale( BORDER_SIZE ) )
         , _windowArea( _activeArea.x - _borderSize, _activeArea.y - _borderSize, _activeArea.width + 2 * _borderSize, _activeArea.height + 2 * _borderSize )
         , _shadowSize( _borderSize )
-        , _restorer( ctx, _windowArea.x - _shadowSize, _windowArea.y, _windowArea.width + _shadowSize, _windowArea.height + _shadowSize )
+        , _restorer( _ctx, _windowArea.x - _shadowSize, _windowArea.y, _windowArea.width + _shadowSize, _windowArea.height + _shadowSize )
         , _background( stretchBackground() )
     {
         redraw();
