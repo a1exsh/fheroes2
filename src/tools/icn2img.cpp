@@ -99,7 +99,9 @@ int main( int argc, char ** argv )
             continue;
         }
 
-        const std::filesystem::path prefixPath = std::filesystem::path( dstDir ) / std::filesystem::path( inputFileName ).stem();
+        const std::filesystem::path inputFilePath = std::filesystem::path( inputFileName );
+        const std::filesystem::path prefixPath = std::filesystem::path( dstDir ) / inputFilePath;
+        // no stemming, to preserve extension such as .std, .wlk, .atk
 
         std::error_code ec;
 
@@ -120,19 +122,32 @@ int main( int argc, char ** argv )
         const uint16_t spritesCount = inputStream.getLE16();
         const uint32_t totalSize = inputStream.getLE32();
 
+        std::cout << "sprites count: " << spritesCount << std::endl;
+        std::cout << "total size: " << totalSize << std::endl;
+
         const size_t beginPos = inputStream.tell();
 
         std::vector<fheroes2::ICNHeader> headers( spritesCount );
         for ( fheroes2::ICNHeader & header : headers ) {
             inputStream >> header;
+            std::cout << "[" << header.offsetX << ", " << header.offsetY << "] "
+                      << header.width << " x " << header.height << " @ " << header.offsetData
+                      << std::endl;
         }
 
+        bool seenMonoMarker = false;
+
         for ( uint16_t spriteIdx = 0; spriteIdx < spritesCount; ++spriteIdx ) {
-            const fheroes2::ICNHeader & header = headers[spriteIdx];
+            fheroes2::ICNHeader & header = headers[spriteIdx];
 
-            inputStream.seek( beginPos + header.offsetData );
-
+            int seekPos = beginPos + header.offsetData;
             const uint32_t dataSize = ( spriteIdx + 1 < spritesCount ? headers[spriteIdx + 1].offsetData - header.offsetData : totalSize - header.offsetData );
+
+            std::cout << "sprite #" << spriteIdx << " begins @ " << seekPos
+                      << " size: " << dataSize << std::endl;
+
+            inputStream.seek( seekPos );
+
             if ( dataSize == 0 ) {
                 ++spritesFailed;
 
@@ -148,7 +163,33 @@ int main( int argc, char ** argv )
                 continue;
             }
 
-            const fheroes2::Sprite sprite = fheroes2::decodeICNSprite( buf.data(), buf.data() + dataSize, header );
+            if ( inputFilePath.extension() == ".std"
+                 && header.width == 1 && header.height == 1 ) {
+                seenMonoMarker = true;
+            }
+
+            if ( ( inputFilePath.extension() == ".std"
+                   && ( spriteIdx == 0 || seenMonoMarker ) ) ||
+                 ( inputFilePath.extension() == ".atk"
+                   && spriteIdx > 9 ) ||
+                 ( inputFilePath.extension() == ".wlk"
+                   && spriteIdx > 5 ) ) {
+                header.animationFrames = 0x20; // monochromatic flag
+            }
+
+            const fheroes2::Sprite sprite =
+                fheroes2::decodeICNSprite( buf.data(), buf.data() + dataSize, header );
+
+            // fheroes2::Sprite sprite( header.width, header.height );
+            // sprite.reset();
+            // sprite._disableTransformLayer();
+
+            // const uint8_t * data = buf.data();
+            // uint8_t * imgData = sprite.image();
+
+            // for ( uint32_t p = 0; p < dataSize; ++p ) {
+            //     *imgData++ = *data++;
+            // }
 
             std::ostringstream spriteIdxStream;
             spriteIdxStream << std::setw( 3 ) << std::setfill( '0' ) << spriteIdx;
@@ -187,6 +228,8 @@ int main( int argc, char ** argv )
             }
 
             ++spritesExtracted;
+
+            // break;
         }
     }
 

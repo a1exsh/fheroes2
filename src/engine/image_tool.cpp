@@ -255,6 +255,9 @@ namespace fheroes2
 
         uint32_t posX = 0;
 
+        // const uint8_t * dataStart = data;
+        // int rowNumber = 0;
+
         // The need for a transform layer can only be determined during ICN decoding.
         bool noTransformLayer = true;
 
@@ -303,9 +306,20 @@ namespace fheroes2
             uint8_t * imageData = sprite.image();
 
             while ( data < dataEnd ) {
+                // int dataPos = data - dataStart;
+                // printf("@ %d / %06x: %3d / %02x => ", dataPos, dataPos, *data, *data);
+                // //std::cout << "@ " << std::setbase( 10 ) << dataPos << " / "
+                //           << std::setbase( 16 ) << std::setw( 6 ) << std::setfill( '0' )
+                //           << dataPos
+                //           << ": " << std::setw( 3 ) << std::setfill( ' ' ) << (int) *data
+                //           << " / " << std::setbase( 16 ) << std::setw( 2 )
+                //           << std::setfill( '0' ) << (int) *data
+                //           << " => ";
+
                 if ( *data == 0 ) {
                     // 0x00 - end of row reached, go to the first pixel of next row.
                     // All of remaining pixels of current line are transparent.
+                    //std::cout << "end of row " << rowNumber++ << std::endl;
 
                     noTransformLayer = noTransformLayer && ( static_cast<int32_t>( posX ) >= icnHeader.width );
 
@@ -317,6 +331,7 @@ namespace fheroes2
                 else if ( *data < 0x80 ) {
                     // 0x01-0x7F - number N of sprite pixels.
                     // The next N bytes are the colors of the next N pixels.
+                    //std::cout << "copy this many pixels" << std::endl;
 
                     const uint8_t pixelCount = *data;
                     ++data;
@@ -334,68 +349,72 @@ namespace fheroes2
                 }
                 else if ( *data == 0x80 ) {
                     // 0x80 - end of image
+                    //std::cout << "end of image" << std::endl;
 
                     noTransformLayer = noTransformLayer && ( static_cast<int32_t>( posX ) >= icnHeader.width );
 
                     break;
                 }
-                else if ( *data < 0xC0 ) {
+                else /* if ( *data < 0xC0 ) */ {
                     // 0x81 to 0xBF - number of empty (transparent) pixels + 0x80. The (n - 128) pixels are transparent.
+                    //std::cout << static_cast< int >(*data - 0x80) << " transparent pixels" << std::endl;
 
                     noTransformLayer = false;
 
                     posX += *data - 0x80;
                     ++data;
                 }
-                else if ( *data == 0xC0 ) {
-                    // 0xC0 - put here N transform layer pixels.
-                    // If the next byte modulo 4 is not null, N equals the next byte modulo 4,
-                    // otherwise N equals the second next byte.
+                // else if ( *data == 0xC0 ) {
+                //     // 0xC0 - put here N transform layer pixels.
+                //     // If the next byte modulo 4 is not null, N equals the next byte modulo 4,
+                //     // otherwise N equals the second next byte.
 
-                    noTransformLayer = false;
+                //     noTransformLayer = false;
 
-                    ++data;
+                //     ++data;
 
-                    const uint8_t transformValue = *data;
+                //     const uint8_t transformValue = *data;
 
-                    const uint32_t countValue = transformValue & 0x03;
-                    const uint32_t pixelCount = ( countValue != 0 ) ? countValue : *( ++data );
+                //     const uint32_t countValue = transformValue & 0x03;
+                //     const uint32_t pixelCount = ( countValue != 0 ) ? countValue : *( ++data );
 
-                    if ( transformValue & 0x40 ) {
-                        // Transform layer data types:
-                        // 0 - no transparency,
-                        // 1 - full transparency (to skip image data),
-                        // from 5 (light) to 2 (strong) - for darkening,
-                        // from 10 (light) to 6 (strong) - for lightening
-                        const uint8_t transformType = static_cast<uint8_t>( ( ( transformValue & 0x3C ) >> 2 ) + 2 );
+                //     if ( transformValue & 0x40 ) {
+                //         // Transform layer data types:
+                //         // 0 - no transparency,
+                //         // 1 - full transparency (to skip image data),
+                //         // from 5 (light) to 2 (strong) - for darkening,
+                //         // from 10 (light) to 6 (strong) - for lightening
+                //         const uint8_t transformType = static_cast<uint8_t>( ( ( transformValue & 0x3C ) >> 2 ) + 2 );
 
-                        if ( transformType < 16 ) {
-                            memset( imageTransform + posX, transformType, pixelCount );
-                        }
-                    }
+                //         //std::cout << "transform layer control: " << pixelCount << "x " << (int) transformType << std::endl;
 
-                    // TODO: Use ( transformValue & 0x80 ) to detect and store shining contour data bit.
-                    // It is used for units on the Battlefield and for icons in the View World.
+                //         if ( transformType < 16 ) {
+                //             memset( imageTransform + posX, transformType, pixelCount );
+                //         }
+                //     }
 
-                    posX += pixelCount;
+                //     // TODO: Use ( transformValue & 0x80 ) to detect and store shining contour data bit.
+                //     // It is used for units on the Battlefield and for icons in the View World.
 
-                    ++data;
-                }
-                else {
-                    // 0xC1 - next byte stores the number of next pixels of same color, or
-                    // 0xC2 to 0xFF - the number of pixels of same color plus 0xC0.
-                    // Next byte is the color of these pixels.
+                //     posX += pixelCount;
 
-                    const uint32_t pixelCount = ( *data == 0xC1 ) ? *( ++data ) : *data - 0xC0;
-                    ++data;
+                //     ++data;
+                // }
+                // else {
+                //     // 0xC1 - next byte stores the number of next pixels of same color, or
+                //     // 0xC2 to 0xFF - the number of pixels of same color plus 0xC0.
+                //     // Next byte is the color of these pixels.
+                //     const uint32_t pixelCount = ( *data == 0xC1 ) ? *( ++data ) : *data - 0xC0;
+                //     ++data;
+                //     //std::cout << "run-length encoding: " << pixelCount << "x " << (int) *data << std::endl;
 
-                    memset( imageData + posX, *data, pixelCount );
-                    memset( imageTransform + posX, static_cast<uint8_t>( 0 ), pixelCount );
+                //     memset( imageData + posX, *data, pixelCount );
+                //     memset( imageTransform + posX, static_cast<uint8_t>( 0 ), pixelCount );
 
-                    posX += pixelCount;
+                //     posX += pixelCount;
 
-                    ++data;
-                }
+                //     ++data;
+                // }
             }
         }
 

@@ -109,7 +109,7 @@ IStreamBase & operator>>( IStreamBase & stream, fheroes2::ICNHeader & icn )
     icn.offsetY = static_cast<int16_t>( stream.getLE16() );
     icn.width = stream.getLE16();
     icn.height = stream.getLE16();
-    icn.animationFrames = stream.get();
+    icn.animationFrames = 0; // stream.get();
     icn.offsetData = stream.getLE32();
 
     return stream;

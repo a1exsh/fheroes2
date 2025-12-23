@@ -100,24 +100,51 @@ int main( int argc, char ** argv )
         }
 
         const size_t inputStreamSize = inputStream.size();
-        const uint16_t itemsCount = inputStream.getLE16();
+        std::cout << "File size: " << inputStreamSize << std::endl;
 
-        ROStreamBuf itemsStream = inputStream.getStreamBuf( static_cast<size_t>( itemsCount ) * 4 * 3 /* hash, offset, size */ );
-        inputStream.seek( inputStreamSize - AGGItemNameLen * itemsCount );
+        const uint16_t itemsCount = inputStream.getLE16();
+        std::cout << "Items count: " << itemsCount << std::endl;
+
+        // 2 + 4 * 3: 2-byte "hash" + 4-byte offset + 4-byte size + 4-byte size2
+        ROStreamBuf itemsStream = inputStream.getStreamBuf( static_cast<size_t>( itemsCount ) * (2 + 4 * 3) );
+        std::cout << "" << std::endl;
+
+        const size_t tocPosition = inputStreamSize - AGGItemNameLen * itemsCount;
+        std::cout << "Seeking to TOC at: " << tocPosition << std::endl;
+        inputStream.seek( tocPosition );
+
         ROStreamBuf namesStream = inputStream.getStreamBuf( AGGItemNameLen * itemsCount );
 
         std::map<std::string, AGGItemInfo, std::less<>> aggItemsMap;
 
         for ( uint16_t i = 0; i < itemsCount; ++i ) {
-            AGGItemInfo & info = aggItemsMap[StringLower( namesStream.getString( AGGItemNameLen ) )];
+            std::string name = StringLower( namesStream.getString( AGGItemNameLen ) );
+            AGGItemInfo & info = aggItemsMap[name];
 
-            info.hash = itemsStream.getLE32();
+            // info.hash = itemsStream.getLE32();
+            info.hash = itemsStream.getLE16();
             info.offset = itemsStream.getLE32();
             info.size = itemsStream.getLE32();
+            uint32_t size2 = itemsStream.getLE32();
+
+            std::cout << "Item " << name << ": hash=" << GetHexString(info.hash) << "; offset=" << info.offset
+                      << "; size=" << info.size << "; size2=" << size2 << std::endl;
+
+            if (info.offset >= inputStreamSize) {
+                std::cerr << "offset is outside of the file!" << std::endl;
+                return EXIT_FAILURE;
+            }
+            if (size2 != info.size) {
+                std::cerr << "size2 didn't match!" << std::endl;
+                return EXIT_FAILURE;
+            }
         }
 
         for ( const auto & item : aggItemsMap ) {
             const auto & [name, info] = item;
+
+            // std::string name("kb.pal");
+            // const AGGItemInfo & info = aggItemsMap[name];
 
             if ( info.size == 0 ) {
                 ++itemsFailed;
@@ -132,7 +159,8 @@ int main( int argc, char ** argv )
 
                 std::cerr << inputFileName << ": invalid hash for item " << name << ": expected " << GetHexString( info.hash ) << ", got " << GetHexString( hash )
                           << std::endl;
-                continue;
+                // return EXIT_FAILURE;
+                // continue;
             }
 
             inputStream.seek( info.offset );
@@ -144,7 +172,8 @@ int main( int argc, char ** argv )
                 ++itemsFailed;
 
                 std::cerr << inputFileName << ": item " << name << " has an invalid size of " << info.size << std::endl;
-                continue;
+                return EXIT_FAILURE;
+                // continue;
             }
 
             const std::filesystem::path outputFilePath = prefixPath / std::filesystem::path( name );
@@ -172,6 +201,7 @@ int main( int argc, char ** argv )
 
             ++itemsExtracted;
         }
+        //while (false);
     }
 
     std::cout << "Total extracted items: " << itemsExtracted << ", failed items: " << itemsFailed << std::endl;
